@@ -34,5 +34,8 @@ namespace ERechnung
 
         [DispId(9)]
         void AddDeliveryAddress(string name, string street, string postcode, string city, string country);
+
+        [DispId(10)]
+        void AddSkonto(int dueDays, double skontoPercent);
     }
 }

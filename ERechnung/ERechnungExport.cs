@@ -141,11 +141,23 @@ namespace ERechnung
             };
         }
 
+        //desc.AddTradePaymentTerms("3% Skonto innerhalb 10 Tagen bis 15.03.2018", new DateTime(2018, 3, 15), PaymentTermsType.Skonto, 30, 3m);
+        public void AddSkonto(int dueDays, double skontoPercent)
+        {
+            this.xRechnung.SkontoOptions.Add(new PaymentTerms()
+            {
+                DueDays = dueDays,
+                PaymentTermsType = PaymentTermsType.Skonto,
+                Percentage = (decimal)skontoPercent
+            });
+        }
+
         public void Reset()
         {
             this.xRechnung = new XRechnung();
             this.xRechnung.LineItems = new List<LineItem>();
             this.xRechnung.BankAccounts = new List<Bankkonto>();
+            this.xRechnung.SkontoOptions = new List<PaymentTerms>();
         }
     }
 }

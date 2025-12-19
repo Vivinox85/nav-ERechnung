@@ -22,6 +22,7 @@ namespace ERechnung.Models
         public Party DeliveryAddress { get; set; }
         public List<LineItem> LineItems { get; set; }
         public List<Bankkonto> BankAccounts { get; set; }
+        public List<PaymentTerms> SkontoOptions {  get; set; }
         public decimal TotalNetAmount
         {
             get
@@ -108,6 +109,11 @@ namespace ERechnung.Models
 
             desc.AddTradePaymentTerms(description:this.PaymentTerms, dueDate:this.PaymentDueDate);
 
+            foreach(PaymentTerms pt in this.SkontoOptions)
+            {
+                desc.AddTradePaymentTerms(pt.Description, pt.DueDate, pt.PaymentTermsType, pt.DueDays, pt.Percentage);
+            }
+            
             foreach (LineItem lineItem in this.LineItems)
             {
                 desc.AddTradeLineItem(name:lineItem.Name, netUnitPrice:lineItem.UnitPrice, unitCode:lineItem.Unit, description:lineItem.Description, billedQuantity:lineItem.Quantity, grossUnitPrice:lineItem.UnitPrice + (lineItem.UnitPrice * lineItem.TaxPercent / 100), lineTotalAmount:lineItem.LineTotal, taxType:lineItem.TaxType, categoryCode:lineItem.TaxCategory, taxPercent:lineItem.TaxPercent, sellerAssignedID:lineItem.ID, buyerAssignedID:lineItem.CustomerID);
@@ -132,7 +138,7 @@ namespace ERechnung.Models
 
             // X-Rechnung:
             desc.BusinessProcess = "urn:fdc:peppol.eu:2017:poacc:billing:01:1.0";
-
+          
             FileStream stream = new FileStream(filePath, FileMode.Create, FileAccess.Write);
             desc.Save(stream:stream, version:ZUGFeRDVersion.Version23, profile:Profile.XRechnung);
             stream.Flush();
