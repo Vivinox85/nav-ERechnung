@@ -19,6 +19,7 @@ namespace ERechnung.Models
         public DateTime PaymentDueDate { get; set; }
         public Seller Seller { get; set; }
         public Buyer Buyer { get; set; }
+        public Party DeliveryAddress { get; set; }
         public List<LineItem> LineItems { get; set; }
         public List<Bankkonto> BankAccounts { get; set; }
         public decimal TotalNetAmount
@@ -75,7 +76,8 @@ namespace ERechnung.Models
 
             InvoiceDescriptor desc = InvoiceDescriptor.CreateInvoice(invoiceNo:this.InvoiceNumber, invoiceDate:this.InvoiceDate, currency:this.Currency);
             desc.ReferenceOrderNo = this.OrderNumber;
-            // Verwendungszweck:
+            
+            // Verwendungszweck für Zahlung:
             desc.PaymentReference = this.InvoiceNumber;
 
             desc.SetBuyer(name:this.Buyer.Name, postcode:this.Buyer.ZipCode, city:this.Buyer.City, street:this.Buyer.Street, country:this.Buyer.Country, id:this.Buyer.ID);
@@ -84,10 +86,13 @@ namespace ERechnung.Models
             desc.SetBuyerOrderReferenceDocument(orderNo:this.Buyer.OrderReferenceDocument, orderDate:this.Buyer.OrderReferenceDocumentDate);
             desc.SetBuyerElectronicAddress(address:this.Buyer.Email, electronicAddressSchemeID:ElectronicAddressSchemeIdentifiers.EM);
 
-            desc.SetSeller(name:this.Seller.Name, postcode:this.Seller.ZipCode, city:this.Seller.City, street:this.Seller.Street, country:this.Seller.Country, id: this.Seller.ID);
+            desc.SetSeller(name:this.Seller.Name, postcode:this.Seller.ZipCode, city:this.Seller.City, street:this.Seller.Street, country:this.Seller.Country, id: this.Seller.ID, description:this.Seller.LegalDescription);
             desc.AddSellerTaxRegistration(no:this.Seller.VATID, schemeID:TaxRegistrationSchemeID.VA);
+            desc.AddSellerTaxRegistration(no: this.Seller.TaxNumber, schemeID: TaxRegistrationSchemeID.FC);
             desc.SetSellerContact(name:this.Seller.Contact, orgunit:this.Seller.OrganizationUnit, emailAddress:this.Seller.Email, phoneno:this.Seller.Phone);
             desc.SetSellerElectronicAddress(address:this.Seller.Email, electronicAddressSchemeID:ElectronicAddressSchemeIdentifiers.EM);
+
+            desc.ShipTo = DeliveryAddress;
 
             desc.ActualDeliveryDate = this.DeliveryDate;
 
@@ -206,6 +211,7 @@ namespace ERechnung.Models
     {
         public string TaxNumber { get; set; }
         public string TaxNumberType { get; set; }
+        public string LegalDescription { get; set; }
     }
 
     public class Bankkonto
@@ -214,6 +220,6 @@ namespace ERechnung.Models
         public string BIC {  get; set; }
         public string Bankleitzahl { get; set; }
         public string Bankname { get; set; }
-        public string Kontoinhaber { get; set; }
+        public string Kontoinhaber { get; set; }        
     }
 }

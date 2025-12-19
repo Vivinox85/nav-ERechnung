@@ -44,10 +44,11 @@ namespace ERechnung
             this.xRechnung.PaymentDueDate = paymentDueDate;
         }
 
-        public void AddSeller(string name, string street, string zipCode, string city, string country, string vatID, string contact, string id, string email, string phone)
+        public void AddSeller(string name, string street, string zipCode, string city, string country, string vatID, string taxNumber, string legalDescription, string contact, string id, string email, string phone)
         {
             CountryCodes countryCode;
             Enum.TryParse(country, out countryCode);
+
             this.xRechnung.Seller = new Seller()
             {
                 Name = name,
@@ -60,7 +61,9 @@ namespace ERechnung
                 Contact = contact,
                 ID = id,
                 Email = email,
-                Phone = phone
+                Phone = phone,
+                TaxNumber = taxNumber,
+                LegalDescription = legalDescription
             };
         }
 
@@ -122,6 +125,20 @@ namespace ERechnung
                 Bankname = bankname,
                 Kontoinhaber = kontoinhaber
             });
+        }
+
+        public void AddDeliveryAddress(string name, string street, string postcode, string city, string country)
+        {
+            CountryCodes countryCode;
+            Enum.TryParse(country, out countryCode);
+            this.xRechnung.DeliveryAddress = new Party()
+            {
+                Name = name,
+                Street = street,
+                Postcode = postcode,
+                City = city,
+                Country = countryCode                
+            };
         }
 
         public void Reset()

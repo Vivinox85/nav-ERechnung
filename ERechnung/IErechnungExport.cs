@@ -21,7 +21,7 @@ namespace ERechnung
         void FillInvoiceHeader(string invoiceNumber, string orderNumber, DateTime invoiceDate, string currencyCode, DateTime deliveryDate, string paymentTerms, DateTime paymentDueDate);
 
         [DispId(5)]
-        void AddSeller(string name, string street, string zipCode, string city, string country, string vatID, string contact, string id, string email, string phone);
+        void AddSeller(string name, string street, string zipCode, string city, string country, string vatID, string taxNumber, string legalDescription, string contact, string id, string email, string phone);
 
         [DispId(6)]
         void AddBuyer(string name, string street, string zipCode, string city, string country, string vatID, string contact, string organizationUnit, string email, string phone, string id, string orderReferenceDocument);
@@ -30,6 +30,9 @@ namespace ERechnung
         void AddLineItem(string id, string name, string description, string customerID, double quantity, string quantityCode, double unitPrice, string taxCategory, string taxType, double taxPercent, double lineTotal);
 
         [DispId(8)]
-        void AddBankAccount(string iban, string bic, string bankleitzahl, string bankname, string kontoinhaber);        
+        void AddBankAccount(string iban, string bic, string bankleitzahl, string bankname, string kontoinhaber);
+
+        [DispId(9)]
+        void AddDeliveryAddress(string name, string street, string postcode, string city, string country);
     }
 }
