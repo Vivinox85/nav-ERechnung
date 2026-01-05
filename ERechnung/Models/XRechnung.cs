@@ -116,7 +116,8 @@ namespace ERechnung.Models
             
             foreach (LineItem lineItem in this.LineItems)
             {
-                desc.AddTradeLineItem(name:lineItem.Name, netUnitPrice:lineItem.UnitPrice, unitCode:lineItem.Unit, description:lineItem.Description, billedQuantity:lineItem.Quantity, grossUnitPrice:lineItem.UnitPrice + (lineItem.UnitPrice * lineItem.TaxPercent / 100), lineTotalAmount:lineItem.LineTotal, taxType:lineItem.TaxType, categoryCode:lineItem.TaxCategory, taxPercent:lineItem.TaxPercent, sellerAssignedID:lineItem.ID, buyerAssignedID:lineItem.CustomerID);
+                TradeLineItem curItem = desc.AddTradeLineItem(name:lineItem.Name, netUnitPrice:lineItem.UnitPrice, unitCode:lineItem.Unit, description:lineItem.Description, billedQuantity:lineItem.Quantity, grossUnitPrice:lineItem.UnitPrice + (lineItem.UnitPrice * lineItem.TaxPercent / 100), lineTotalAmount:lineItem.LineTotal, taxType:lineItem.TaxType, categoryCode:lineItem.TaxCategory, taxPercent:lineItem.TaxPercent, sellerAssignedID:lineItem.ID, buyerAssignedID:lineItem.CustomerID);
+                curItem.OriginTradeCountry = lineItem.OriginCountry;
                 if (lineItem.TaxCategory == TaxCategoryCodes.Z)
                 {
                     overallTaxCategory = TaxCategoryCodes.Z;
@@ -193,6 +194,7 @@ namespace ERechnung.Models
         public TaxTypes TaxType { get; set; }
         public TaxCategoryCodes TaxCategory { get; set; }
         public decimal TaxPercent { get; set; }
+        public CountryCodes OriginCountry { get; set; }
     }
 
     public class Buyer

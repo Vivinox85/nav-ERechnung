@@ -89,15 +89,17 @@ namespace ERechnung
             };
         }
 
-        public void AddLineItem(string id, string name, string description, string customerID, double quantity, string quantityCode, double unitPrice, string taxCategory, string taxType, double taxPercent, double lineTotal)
+        public void AddLineItem(string id, string name, string description, string customerID, double quantity, string quantityCode, double unitPrice, string taxCategory, string taxType, double taxPercent, double lineTotal, string originCountry)
         {
             QuantityCodes qc;
             TaxCategoryCodes tc;
             TaxTypes tt;
+            CountryCodes originCountryCode;            
 
             Enum.TryParse(quantityCode, out qc);
             Enum.TryParse(taxCategory, out tc);
             Enum.TryParse(taxType, out tt);
+            Enum.TryParse(originCountry, out originCountryCode);
 
             this.xRechnung.LineItems.Add(new LineItem()
             {
@@ -111,7 +113,8 @@ namespace ERechnung
                 TaxCategory = tc,
                 TaxType = tt,
                 TaxPercent = (decimal)taxPercent,
-                LineTotal = (decimal)lineTotal
+                LineTotal = (decimal)lineTotal,
+                OriginCountry = originCountryCode
             });
         }
 
