@@ -122,7 +122,7 @@ namespace ERechnung.Models
             
             foreach (LineItem lineItem in this.LineItems)
             {
-                TradeLineItem curItem = desc.AddTradeLineItem(name:lineItem.Name, netUnitPrice:lineItem.UnitPrice, unitCode:lineItem.Unit, description:lineItem.Description, billedQuantity:lineItem.Quantity, grossUnitPrice:lineItem.UnitPrice + (lineItem.UnitPrice * lineItem.TaxPercent / 100), lineTotalAmount:lineItem.LineTotal, taxType:lineItem.TaxType, categoryCode:lineItem.TaxCategory, taxPercent:lineItem.TaxPercent, sellerAssignedID:lineItem.ID, buyerAssignedID:lineItem.CustomerID);
+                TradeLineItem curItem = desc.AddTradeLineItem(name:lineItem.Name, netUnitPrice:lineItem.UnitPrice, unitCode:lineItem.Unit, unitQuantity: lineItem.UnitQuantity, description:lineItem.Description, billedQuantity:lineItem.Quantity, grossUnitPrice:lineItem.UnitPrice + (lineItem.UnitPrice * lineItem.TaxPercent / 100), lineTotalAmount:lineItem.LineTotal, taxType:lineItem.TaxType, categoryCode:lineItem.TaxCategory, taxPercent:lineItem.TaxPercent, sellerAssignedID:lineItem.ID, buyerAssignedID:lineItem.CustomerID);
                 curItem.OriginTradeCountry = lineItem.OriginCountry;
                 if (lineItem.TaxCategory == TaxCategoryCodes.Z)
                 {
@@ -162,6 +162,7 @@ namespace ERechnung.Models
         public string Description { get; set; }
         public string CustomerID { get; set; }
         public QuantityCodes Unit { get; set; }
+        public decimal UnitQuantity { get; set; }
         public decimal Quantity { get; set; }
         public decimal UnitPrice { get; set; }
         public decimal LineTotal { get; set; }
