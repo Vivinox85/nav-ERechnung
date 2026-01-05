@@ -66,7 +66,7 @@ namespace ERechnung
             };
         }
 
-        public void AddBuyer(string name, string street, string zipCode, string city, string country, string vatID, string contact, string organizationUnit, string email, string phone, string id, string orderReferenceDocument)
+        public void AddBuyer(string name, string street, string street2, string zipCode, string city, string country, string vatID, string contact, string organizationUnit, string email, string phone, string id, string orderReferenceDocument)
         {
             CountryCodes countryCode;
             Enum.TryParse(country, out countryCode);
@@ -74,6 +74,7 @@ namespace ERechnung
             {
                 Name = name,
                 Street = street,
+                Street2 = street2,
                 ZipCode = zipCode,
                 City = city,
                 Country = countryCode,
@@ -130,14 +131,15 @@ namespace ERechnung
             });
         }
 
-        public void AddDeliveryAddress(string name, string street, string postcode, string city, string country)
+        public void AddDeliveryAddress(string name, string street, string street2, string postcode, string city, string country)
         {
             CountryCodes countryCode;
             Enum.TryParse(country, out countryCode);
             this.xRechnung.DeliveryAddress = new Party()
             {
                 Name = name,
-                Street = street,
+                ContactName = street,
+                Street = street2,
                 Postcode = postcode,
                 City = city,
                 Country = countryCode                

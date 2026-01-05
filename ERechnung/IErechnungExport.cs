@@ -24,7 +24,7 @@ namespace ERechnung
         void AddSeller(string name, string street, string zipCode, string city, string country, string vatID, string taxNumber, string contact, string id, string email, string phone);
 
         [DispId(6)]
-        void AddBuyer(string name, string street, string zipCode, string city, string country, string vatID, string contact, string organizationUnit, string email, string phone, string id, string orderReferenceDocument);
+        void AddBuyer(string name, string street, string street2, string zipCode, string city, string country, string vatID, string contact, string organizationUnit, string email, string phone, string id, string orderReferenceDocument);
 
         [DispId(7)]
         void AddLineItem(string id, string name, string description, string customerID, double quantity, string quantityCode, double unitPrice, double unitQuantity, string taxCategory, string taxType, double taxPercent, double lineTotal, string originCountry);
@@ -33,7 +33,7 @@ namespace ERechnung
         void AddBankAccount(string iban, string bic, string bankleitzahl, string bankname, string kontoinhaber);
 
         [DispId(9)]
-        void AddDeliveryAddress(string name, string street, string postcode, string city, string country);
+        void AddDeliveryAddress(string name, string street, string street2, string postcode, string city, string country);
 
         [DispId(10)]
         void AddSkonto(int dueDays, double skontoPercent);

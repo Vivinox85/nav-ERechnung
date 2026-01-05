@@ -82,7 +82,7 @@ namespace ERechnung.Models
             // Verwendungszweck für Zahlung:
             desc.PaymentReference = this.InvoiceNumber;
 
-            desc.SetBuyer(name:this.Buyer.Name, postcode:this.Buyer.ZipCode, city:this.Buyer.City, street:this.Buyer.Street, country:this.Buyer.Country, id:this.Buyer.ID);
+            desc.SetBuyer(name:this.Buyer.Name, postcode:this.Buyer.ZipCode, city:this.Buyer.City, street:this.Buyer.Street2, receiver: this.Buyer.Street, country:this.Buyer.Country, id:this.Buyer.ID);
             desc.AddBuyerTaxRegistration(no:this.Buyer.VATID, schemeID:TaxRegistrationSchemeID.VA);
             desc.SetBuyerContact(name:this.Buyer.Contact, emailAddress:this.Buyer.Email);
             desc.SetBuyerOrderReferenceDocument(orderNo:this.Buyer.OrderReferenceDocument, orderDate:this.Buyer.OrderReferenceDocumentDate);
@@ -210,6 +210,7 @@ namespace ERechnung.Models
         public string ZipCode { get; set; }
         public string City { get; set; }
         public string Street { get; set; }
+        public string Street2 { get; set; }
         public CountryCodes Country { get; set; }
         public string VATID { get; set; }
         public TaxRegistrationSchemeID TaxRegistrationSchemeID { get; set; }
