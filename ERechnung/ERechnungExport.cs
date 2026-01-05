@@ -44,7 +44,7 @@ namespace ERechnung
             this.xRechnung.PaymentDueDate = paymentDueDate;
         }
 
-        public void AddSeller(string name, string street, string zipCode, string city, string country, string vatID, string taxNumber, string legalDescription, string contact, string id, string email, string phone)
+        public void AddSeller(string name, string street, string zipCode, string city, string country, string vatID, string taxNumber, string contact, string id, string email, string phone)
         {
             CountryCodes countryCode;
             Enum.TryParse(country, out countryCode);
@@ -62,8 +62,7 @@ namespace ERechnung
                 ID = id,
                 Email = email,
                 Phone = phone,
-                TaxNumber = taxNumber,
-                LegalDescription = legalDescription
+                TaxNumber = taxNumber
             };
         }
 
@@ -109,7 +108,7 @@ namespace ERechnung
                 CustomerID = customerID,
                 Quantity = (decimal)quantity,
                 Unit = qc,
-                UnitPrice = (decimal)unitPrice,
+                UnitPrice = (decimal)unitPrice,                
                 TaxCategory = tc,
                 TaxType = tt,
                 TaxPercent = (decimal)taxPercent,
@@ -161,6 +160,14 @@ namespace ERechnung
             this.xRechnung.LineItems = new List<LineItem>();
             this.xRechnung.BankAccounts = new List<Bankkonto>();
             this.xRechnung.SkontoOptions = new List<PaymentTerms>();
+            this.xRechnung.Notes = new List<Note>();
+        }
+
+        public void AddInvoiceNote(string text, string subjectCode)
+        {
+            SubjectCodes subCode;
+            Enum.TryParse(subjectCode, out subCode);
+            this.xRechnung.Notes.Add(new Note(text, subjectCode: subCode));
         }
     }
 }

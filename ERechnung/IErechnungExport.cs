@@ -21,7 +21,7 @@ namespace ERechnung
         void FillInvoiceHeader(string invoiceNumber, string orderNumber, DateTime invoiceDate, string currencyCode, DateTime deliveryDate, string paymentTerms, DateTime paymentDueDate);
 
         [DispId(5)]
-        void AddSeller(string name, string street, string zipCode, string city, string country, string vatID, string taxNumber, string legalDescription, string contact, string id, string email, string phone);
+        void AddSeller(string name, string street, string zipCode, string city, string country, string vatID, string taxNumber, string contact, string id, string email, string phone);
 
         [DispId(6)]
         void AddBuyer(string name, string street, string zipCode, string city, string country, string vatID, string contact, string organizationUnit, string email, string phone, string id, string orderReferenceDocument);
@@ -37,5 +37,8 @@ namespace ERechnung
 
         [DispId(10)]
         void AddSkonto(int dueDays, double skontoPercent);
+
+        [DispId(11)]
+        void AddInvoiceNote(string text, string subjectCode);
     }
 }

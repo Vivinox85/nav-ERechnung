@@ -23,6 +23,7 @@ namespace ERechnung.Models
         public List<LineItem> LineItems { get; set; }
         public List<Bankkonto> BankAccounts { get; set; }
         public List<PaymentTerms> SkontoOptions {  get; set; }
+        public List<Note> Notes {  get; set; }
         public decimal TotalNetAmount
         {
             get
@@ -87,7 +88,7 @@ namespace ERechnung.Models
             desc.SetBuyerOrderReferenceDocument(orderNo:this.Buyer.OrderReferenceDocument, orderDate:this.Buyer.OrderReferenceDocumentDate);
             desc.SetBuyerElectronicAddress(address:this.Buyer.Email, electronicAddressSchemeID:ElectronicAddressSchemeIdentifiers.EM);
 
-            desc.SetSeller(name:this.Seller.Name, postcode:this.Seller.ZipCode, city:this.Seller.City, street:this.Seller.Street, country:this.Seller.Country, id: this.Seller.ID, description:this.Seller.LegalDescription);
+            desc.SetSeller(name:this.Seller.Name, postcode:this.Seller.ZipCode, city:this.Seller.City, street:this.Seller.Street, country:this.Seller.Country, id: this.Seller.ID);
             desc.AddSellerTaxRegistration(no:this.Seller.VATID, schemeID:TaxRegistrationSchemeID.VA);
             desc.AddSellerTaxRegistration(no: this.Seller.TaxNumber, schemeID: TaxRegistrationSchemeID.FC);
             desc.SetSellerContact(name:this.Seller.Contact, orgunit:this.Seller.OrganizationUnit, emailAddress:this.Seller.Email, phoneno:this.Seller.Phone);
@@ -112,6 +113,11 @@ namespace ERechnung.Models
             foreach(PaymentTerms pt in this.SkontoOptions)
             {
                 desc.AddTradePaymentTerms(pt.Description, pt.DueDate, pt.PaymentTermsType, pt.DueDays, pt.Percentage);
+            }
+
+            foreach(Note curNote in this.Notes)
+            {
+                desc.AddNote(note: curNote.Content, subjectCode: curNote.SubjectCode);
             }
             
             foreach (LineItem lineItem in this.LineItems)
@@ -219,7 +225,6 @@ namespace ERechnung.Models
     {
         public string TaxNumber { get; set; }
         public string TaxNumberType { get; set; }
-        public string LegalDescription { get; set; }
     }
 
     public class Bankkonto
