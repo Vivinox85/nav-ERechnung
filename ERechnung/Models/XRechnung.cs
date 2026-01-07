@@ -10,6 +10,7 @@ namespace ERechnung.Models
 {
     internal class XRechnung
     {
+        private InvoiceDescriptor desc { get; set; }
         public string InvoiceNumber { get; set; }
         public DateTime InvoiceDate { get; set; }
         public CurrencyCodes Currency { get; set; }
@@ -22,8 +23,8 @@ namespace ERechnung.Models
         public Party DeliveryAddress { get; set; }
         public List<LineItem> LineItems { get; set; }
         public List<Bankkonto> BankAccounts { get; set; }
-        public List<PaymentTerms> SkontoOptions {  get; set; }
-        public List<Note> Notes {  get; set; }
+        public List<PaymentTerms> SkontoOptions { get; set; }
+        public List<Note> Notes { get; set; }
         public decimal TotalNetAmount
         {
             get
@@ -72,86 +73,97 @@ namespace ERechnung.Models
         // create XML from XRechnung object with s2industries.ZUGFeRD
         public bool CreateXML(string filePath)
         {
-            bool success = false;
+            bool success = true;
+            try
+            {
+                FillInvoiceDescriptor();
+                FileStream stream = new FileStream(filePath, FileMode.Create, FileAccess.Write);
+                desc.Save(stream: stream, version: ZUGFeRDVersion.Version23, profile: Profile.XRechnung);
+                stream.Flush();
+                stream.Close();
+            }
+            catch (Exception ex)
+            {
+                success = false;
+            }
+            return success;
+        }
+
+        private void FillInvoiceDescriptor()
+        {
             TaxCategoryCodes overallTaxCategory = TaxCategoryCodes.S;
             decimal overallTaxPercent = 19m;
 
-            InvoiceDescriptor desc = InvoiceDescriptor.CreateInvoice(invoiceNo:this.InvoiceNumber, invoiceDate:this.InvoiceDate, currency:this.Currency);
+            desc = InvoiceDescriptor.CreateInvoice(invoiceNo: this.InvoiceNumber, invoiceDate: this.InvoiceDate, currency: this.Currency);
             desc.ReferenceOrderNo = this.OrderNumber;
-            
+
             // Verwendungszweck für Zahlung:
             desc.PaymentReference = this.InvoiceNumber;
 
-            desc.SetBuyer(name:this.Buyer.Name, postcode:this.Buyer.ZipCode, city:this.Buyer.City, street:this.Buyer.Street2, receiver: this.Buyer.Street, country:this.Buyer.Country, id:this.Buyer.ID);
-            desc.AddBuyerTaxRegistration(no:this.Buyer.VATID, schemeID:TaxRegistrationSchemeID.VA);
-            desc.SetBuyerContact(name:this.Buyer.Contact, emailAddress:this.Buyer.Email);
-            desc.SetBuyerOrderReferenceDocument(orderNo:this.Buyer.OrderReferenceDocument, orderDate:this.Buyer.OrderReferenceDocumentDate);
-            desc.SetBuyerElectronicAddress(address:this.Buyer.Email, electronicAddressSchemeID:ElectronicAddressSchemeIdentifiers.EM);
+            desc.SetBuyer(name: this.Buyer.Name, postcode: this.Buyer.ZipCode, city: this.Buyer.City, street: this.Buyer.Street2, receiver: this.Buyer.Street, country: this.Buyer.Country, id: this.Buyer.ID);
+            desc.AddBuyerTaxRegistration(no: this.Buyer.VATID, schemeID: TaxRegistrationSchemeID.VA);
+            desc.SetBuyerContact(name: this.Buyer.Contact, emailAddress: this.Buyer.Email);
+            desc.SetBuyerOrderReferenceDocument(orderNo: this.Buyer.OrderReferenceDocument, orderDate: this.Buyer.OrderReferenceDocumentDate);
+            desc.SetBuyerElectronicAddress(address: this.Buyer.Email, electronicAddressSchemeID: ElectronicAddressSchemeIdentifiers.EM);
 
-            desc.SetSeller(name:this.Seller.Name, postcode:this.Seller.ZipCode, city:this.Seller.City, street:this.Seller.Street, country:this.Seller.Country, id: this.Seller.ID);
-            desc.AddSellerTaxRegistration(no:this.Seller.VATID, schemeID:TaxRegistrationSchemeID.VA);
+            desc.SetSeller(name: this.Seller.Name, postcode: this.Seller.ZipCode, city: this.Seller.City, street: this.Seller.Street, country: this.Seller.Country, id: this.Seller.ID);
+            desc.AddSellerTaxRegistration(no: this.Seller.VATID, schemeID: TaxRegistrationSchemeID.VA);
             desc.AddSellerTaxRegistration(no: this.Seller.TaxNumber, schemeID: TaxRegistrationSchemeID.FC);
-            desc.SetSellerContact(name:this.Seller.Contact, orgunit:this.Seller.OrganizationUnit, emailAddress:this.Seller.Email, phoneno:this.Seller.Phone);
-            desc.SetSellerElectronicAddress(address:this.Seller.Email, electronicAddressSchemeID:ElectronicAddressSchemeIdentifiers.EM);
+            desc.SetSellerContact(name: this.Seller.Contact, orgunit: this.Seller.OrganizationUnit, emailAddress: this.Seller.Email, phoneno: this.Seller.Phone);
+            desc.SetSellerElectronicAddress(address: this.Seller.Email, electronicAddressSchemeID: ElectronicAddressSchemeIdentifiers.EM);
 
             desc.ShipTo = DeliveryAddress;
 
             desc.ActualDeliveryDate = this.DeliveryDate;
 
             desc.SetTotals(
-                lineTotalAmount:this.TotalNetAmount,
-                chargeTotalAmount:this.TotalChargeAmount,
-                allowanceTotalAmount:this.TotalAllowanceChargeAmount,
-                taxBasisAmount:this.TotalGrossAmount,
-                taxTotalAmount:this.TotalTaxAmount,
-                grandTotalAmount:this.TotalNetAmount + this.TotalTaxAmount,
-                totalPrepaidAmount:this.TotalPrepaidAmount,
-                duePayableAmount:this.TotalDueAmount);
+                lineTotalAmount: this.TotalNetAmount,
+                chargeTotalAmount: this.TotalChargeAmount,
+                allowanceTotalAmount: this.TotalAllowanceChargeAmount,
+                taxBasisAmount: this.TotalGrossAmount,
+                taxTotalAmount: this.TotalTaxAmount,
+                grandTotalAmount: this.TotalNetAmount + this.TotalTaxAmount,
+                totalPrepaidAmount: this.TotalPrepaidAmount,
+                duePayableAmount: this.TotalDueAmount);
 
-            desc.AddTradePaymentTerms(description:this.PaymentTerms, dueDate:this.PaymentDueDate);
+            desc.AddTradePaymentTerms(description: this.PaymentTerms, dueDate: this.PaymentDueDate);
 
-            foreach(PaymentTerms pt in this.SkontoOptions)
+            foreach (PaymentTerms pt in this.SkontoOptions)
             {
                 desc.AddTradePaymentTerms(pt.Description, pt.DueDate, pt.PaymentTermsType, pt.DueDays, pt.Percentage);
             }
 
-            foreach(Note curNote in this.Notes)
+            foreach (Note curNote in this.Notes)
             {
                 desc.AddNote(note: curNote.Content, subjectCode: curNote.SubjectCode);
             }
-            
+
             foreach (LineItem lineItem in this.LineItems)
             {
-                TradeLineItem curItem = desc.AddTradeLineItem(name:lineItem.Name, netUnitPrice:lineItem.UnitPrice, unitCode:lineItem.Unit, unitQuantity: lineItem.UnitQuantity, description:lineItem.Description, billedQuantity:lineItem.Quantity, grossUnitPrice:lineItem.UnitPrice + (lineItem.UnitPrice * lineItem.TaxPercent / 100), lineTotalAmount:lineItem.LineTotal, taxType:lineItem.TaxType, categoryCode:lineItem.TaxCategory, taxPercent:lineItem.TaxPercent, sellerAssignedID:lineItem.ID, buyerAssignedID:lineItem.CustomerID);
+                TradeLineItem curItem = desc.AddTradeLineItem(name: lineItem.Name, netUnitPrice: lineItem.UnitPrice, unitCode: lineItem.Unit, unitQuantity: lineItem.UnitQuantity, description: lineItem.Description, billedQuantity: lineItem.Quantity, grossUnitPrice: lineItem.UnitPrice + (lineItem.UnitPrice * lineItem.TaxPercent / 100), lineTotalAmount: lineItem.LineTotal, taxType: lineItem.TaxType, categoryCode: lineItem.TaxCategory, taxPercent: lineItem.TaxPercent, sellerAssignedID: lineItem.ID, buyerAssignedID: lineItem.CustomerID);
                 curItem.OriginTradeCountry = lineItem.OriginCountry;
                 if (lineItem.TaxCategory == TaxCategoryCodes.Z)
                 {
                     overallTaxCategory = TaxCategoryCodes.Z;
                 }
-                if(lineItem.TaxPercent == 0)
+                if (lineItem.TaxPercent == 0)
                 {
                     overallTaxPercent = 0m;
                 }
             }
 
-            desc.AddApplicableTradeTax(basisAmount:this.TotalNetAmount, percent:overallTaxPercent, taxAmount:this.TotalTaxAmount, typeCode:TaxTypes.VAT, categoryCode:overallTaxCategory);
+            desc.AddApplicableTradeTax(basisAmount: this.TotalNetAmount, percent: overallTaxPercent, taxAmount: this.TotalTaxAmount, typeCode: TaxTypes.VAT, categoryCode: overallTaxCategory);
 
-            desc.SetPaymentMeans(paymentCode:PaymentMeansTypeCodes.SEPACreditTransfer);
+            desc.SetPaymentMeans(paymentCode: PaymentMeansTypeCodes.SEPACreditTransfer);
 
             foreach (Bankkonto bankkonto in this.BankAccounts)
             {
                 desc.AddCreditorFinancialAccount(iban: bankkonto.IBAN, bic: bankkonto.BIC, bankleitzahl: bankkonto.Bankleitzahl, bankName: bankkonto.Bankname, name: bankkonto.Kontoinhaber);
-            }            
+            }
 
             // X-Rechnung:
             desc.BusinessProcess = "urn:fdc:peppol.eu:2017:poacc:billing:01:1.0";
-          
-            FileStream stream = new FileStream(filePath, FileMode.Create, FileAccess.Write);
-            desc.Save(stream:stream, version:ZUGFeRDVersion.Version23, profile:Profile.XRechnung);
-            stream.Flush();
-            stream.Close();
-            success = true;
-            return success;
+
         }
     }
 
@@ -231,10 +243,10 @@ namespace ERechnung.Models
 
     public class Bankkonto
     {
-        public string IBAN {  get; set; }
-        public string BIC {  get; set; }
+        public string IBAN { get; set; }
+        public string BIC { get; set; }
         public string Bankleitzahl { get; set; }
         public string Bankname { get; set; }
-        public string Kontoinhaber { get; set; }        
+        public string Kontoinhaber { get; set; }
     }
 }
