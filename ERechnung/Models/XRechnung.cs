@@ -1,4 +1,5 @@
 ﻿using s2industries.ZUGFeRD;
+using s2industries.ZUGFeRD.PDF;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -84,9 +85,55 @@ namespace ERechnung.Models
             }
             catch (Exception ex)
             {
+                LogError(ex);                
                 success = false;
+                throw;
             }
             return success;
+        }
+
+        public bool CreatePDF(string inPDFPath, string outPDFPath)
+        {
+            bool success = true;
+            try
+            {
+                FillInvoiceDescriptor();
+                InvoicePdfProcessor.SaveToPdf(outPDFPath, ZUGFeRDVersion.Version23, Profile.XRechnung, ZUGFeRDFormats.CII, inPDFPath, this.desc);
+            }
+            catch (Exception ex)
+            {
+                LogError(ex);
+                success = false;
+                throw;
+            }
+            return success;
+        }
+
+        private void LogError(Exception ex)
+        {
+            try
+            {
+                string logPath = @"C:\Temp\ERechnung_Error.txt";
+
+                if (!Directory.Exists(@"C:\Temp")) Directory.CreateDirectory(@"C:\Temp");
+
+                using (StreamWriter sw = new StreamWriter(logPath, true))
+                {
+                    sw.WriteLine("--- " + DateTime.Now.ToString("g") + " ---");
+                    sw.WriteLine("Message: " + ex.Message);
+                    sw.WriteLine("StackTrace: " + ex.StackTrace);
+                    if (ex.InnerException != null)
+                    {
+                        sw.WriteLine("Inner Exception: " + ex.InnerException.Message);
+                        sw.WriteLine("Inner StackTrace: " + ex.InnerException.StackTrace);
+                    }
+                    sw.WriteLine("------------------------------------------");
+                    sw.WriteLine();
+                }
+            }
+            catch
+            {                
+            }
         }
 
         private void FillInvoiceDescriptor()

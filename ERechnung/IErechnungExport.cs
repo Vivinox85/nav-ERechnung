@@ -40,5 +40,8 @@ namespace ERechnung
 
         [DispId(11)]
         void AddInvoiceNote(string text, string subjectCode);
+
+        [DispId(12)]
+        void CreatePDF(string inPDFPath, string outPDFPath);
     }
 }

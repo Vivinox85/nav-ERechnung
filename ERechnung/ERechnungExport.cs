@@ -30,6 +30,11 @@ namespace ERechnung
             this.xRechnung.CreateXML(filePath);
         }
 
+        public void CreatePDF(string inPDFPath, string outPDFPath)
+        {
+            this.xRechnung.CreatePDF(inPDFPath, outPDFPath);
+        }
+
         public void FillInvoiceHeader(string invoiceNumber, string orderNumber, DateTime invoiceDate, string currencyCode, DateTime deliveryDate, string paymentTerms, DateTime paymentDueDate)
         {
             CurrencyCodes currency;
