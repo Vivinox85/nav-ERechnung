@@ -63,9 +63,9 @@ namespace ERechnung.Models
         public bool CreateXML(string filePath)
         {
             bool success = true;
+            FillInvoiceDescriptor();
             try
-            {
-                FillInvoiceDescriptor();
+            {                
                 FileStream stream = new FileStream(filePath, FileMode.Create, FileAccess.Write);
                 desc.Save(stream: stream, version: ZUGFeRDVersion.Version23, profile: Profile.XRechnung);
                 stream.Flush();
@@ -82,9 +82,9 @@ namespace ERechnung.Models
         public bool CreatePDF(string inPDFPath, string outPDFPath)
         {
             bool success = true;
+            FillInvoiceDescriptor();
             try
-            {
-                FillInvoiceDescriptor();
+            {                
                 InvoicePdfProcessor.SaveToPdf(outPDFPath, ZUGFeRDVersion.Version23, Profile.XRechnung, ZUGFeRDFormats.CII, inPDFPath, this.desc);
             }
             catch (Exception ex)
@@ -173,7 +173,16 @@ namespace ERechnung.Models
 
             foreach (LineItem lineItem in this.LineItems)
             {
-                TradeLineItem curItem = desc.AddTradeLineItem(lineID: lineItem.ID, name: lineItem.Name, netUnitPrice: lineItem.UnitPrice, unitCode: lineItem.Unit, unitQuantity: lineItem.UnitQuantity, description: lineItem.Description, billedQuantity: lineItem.Quantity, grossUnitPrice: lineItem.UnitPrice + (lineItem.UnitPrice * lineItem.TaxPercent / 100), lineTotalAmount: lineItem.LineTotal, taxType: lineItem.TaxType, categoryCode: lineItem.TaxCategory, taxPercent: lineItem.TaxPercent, sellerAssignedID: lineItem.ID, buyerAssignedID: lineItem.CustomerID);
+                TradeLineItem curItem;
+                try
+                {
+                    curItem = desc.AddTradeLineItem(lineID: lineItem.ID, name: lineItem.Name, netUnitPrice: lineItem.UnitPrice, unitCode: lineItem.Unit, unitQuantity: lineItem.UnitQuantity, description: lineItem.Description, billedQuantity: lineItem.Quantity, grossUnitPrice: lineItem.UnitPrice + (lineItem.UnitPrice * lineItem.TaxPercent / 100), lineTotalAmount: lineItem.LineTotal, taxType: lineItem.TaxType, categoryCode: lineItem.TaxCategory, taxPercent: lineItem.TaxPercent, sellerAssignedID: lineItem.ID, buyerAssignedID: lineItem.CustomerID);
+                }
+                catch
+                {
+                    curItem = desc.AddTradeLineItem(name: lineItem.Name, netUnitPrice: lineItem.UnitPrice, unitCode: lineItem.Unit, unitQuantity: lineItem.UnitQuantity, description: lineItem.Description, billedQuantity: lineItem.Quantity, grossUnitPrice: lineItem.UnitPrice + (lineItem.UnitPrice * lineItem.TaxPercent / 100), lineTotalAmount: lineItem.LineTotal, taxType: lineItem.TaxType, categoryCode: lineItem.TaxCategory, taxPercent: lineItem.TaxPercent, sellerAssignedID: lineItem.ID, buyerAssignedID: lineItem.CustomerID);
+                }
+                
                 curItem.OriginTradeCountry = lineItem.OriginCountry;
                 if (lineItem.TaxCategory == TaxCategoryCodes.Z)
                 {
