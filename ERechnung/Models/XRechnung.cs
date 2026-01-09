@@ -32,10 +32,6 @@ namespace ERechnung.Models
             {
                 return LineItems.Sum(x => x.LineTotal);
             }
-            set
-            {
-                TotalNetAmount = value;
-            }
         }
         public decimal TotalTaxAmount
         {
@@ -43,20 +39,12 @@ namespace ERechnung.Models
             {
                 return LineItems.Sum(x => x.TaxAmount);
             }
-            set
-            {
-                TotalTaxAmount = value;
-            }
         }
         public decimal TotalGrossAmount
         {
             get
             {
                 return LineItems.Sum(x => x.Total);
-            }
-            set
-            {
-                TotalGrossAmount = value;
             }
         }
         public decimal TotalAllowanceChargeAmount { get; set; }
@@ -225,25 +213,12 @@ namespace ERechnung.Models
         public decimal Quantity { get; set; }
         public decimal UnitPrice { get; set; }
         public decimal LineTotal { get; set; }
-        /*{
-            get
-            {
-                return Quantity * UnitPrice;
-            }
-            set
-            {
-                LineTotal = value;
-            }
-        }*/
+
         public decimal TaxAmount
         {
             get
             {
                 return LineTotal * (TaxPercent / 100);
-            }
-            set
-            {
-                TaxAmount = value;
             }
         }
         public decimal Total
@@ -251,10 +226,6 @@ namespace ERechnung.Models
             get
             {
                 return LineTotal;
-            }
-            set
-            {
-                Total = value;
             }
         }
         public TaxTypes TaxType { get; set; }
