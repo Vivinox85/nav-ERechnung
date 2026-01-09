@@ -75,7 +75,6 @@ namespace ERechnung.Models
             {
                 LogError(ex);                
                 success = false;
-                throw;
             }
             return success;
         }
@@ -92,7 +91,6 @@ namespace ERechnung.Models
             {
                 LogError(ex);
                 success = false;
-                throw;
             }
             return success;
         }
