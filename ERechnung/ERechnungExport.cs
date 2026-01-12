@@ -169,6 +169,7 @@ namespace ERechnung
             this.xRechnung.BankAccounts = new List<Bankkonto>();
             this.xRechnung.SkontoOptions = new List<PaymentTerms>();
             this.xRechnung.Notes = new List<Note>();
+            this.xRechnung.TradeCharges = new List<InvoiceCharge>();
         }
 
         public void AddInvoiceNote(string text, string subjectCode)
@@ -176,6 +177,27 @@ namespace ERechnung
             SubjectCodes subCode;
             Enum.TryParse(subjectCode, out subCode);
             this.xRechnung.Notes.Add(new Note(text, subjectCode: subCode));
+        }
+
+        public void AddCharge(double actualAmount, string reason, string taxCategory, string taxType, double taxPercent, string reasonCode)
+        {
+            TaxCategoryCodes tc;
+            TaxTypes tt;
+            ChargeReasonCodes rc;
+
+            Enum.TryParse(taxCategory, out tc);
+            Enum.TryParse(taxType, out tt);
+            Enum.TryParse(reasonCode, out rc);
+
+            this.xRechnung.TradeCharges.Add(new InvoiceCharge()
+            {
+                ActualAmount = (decimal)actualAmount,
+                Reason = reason,
+                TaxCategoryCode = tc,
+                TaxTypeCode = tt,
+                TaxPercent = (decimal)taxPercent,
+                ChargeReasonCode = rc
+            });
         }
     }
 }

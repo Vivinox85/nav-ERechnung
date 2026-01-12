@@ -26,6 +26,7 @@ namespace ERechnung.Models
         public List<Bankkonto> BankAccounts { get; set; }
         public List<PaymentTerms> SkontoOptions { get; set; }
         public List<Note> Notes { get; set; }
+        public List<InvoiceCharge> TradeCharges { get; set; }
         public decimal TotalNetAmount
         {
             get
@@ -37,14 +38,14 @@ namespace ERechnung.Models
         {
             get
             {
-                return LineItems.Sum(x => x.TaxAmount);
+                return LineItems.Sum(x => x.TaxAmount) + TradeCharges.Sum(y => y.TaxAmount);
             }
         }
         public decimal TotalGrossAmount
         {
             get
             {
-                return LineItems.Sum(x => x.Total);
+                return LineItems.Sum(x => x.Total) + TradeCharges.Sum(y => y.ActualAmount);
             }
         }
         public decimal TotalAllowanceChargeAmount { get; set; }
@@ -147,17 +148,7 @@ namespace ERechnung.Models
 
             desc.ShipTo = DeliveryAddress;
 
-            desc.ActualDeliveryDate = this.DeliveryDate;
-
-            desc.SetTotals(
-                lineTotalAmount: this.TotalNetAmount,
-                chargeTotalAmount: this.TotalChargeAmount,
-                allowanceTotalAmount: this.TotalAllowanceChargeAmount,
-                taxBasisAmount: this.TotalGrossAmount,
-                taxTotalAmount: this.TotalTaxAmount,
-                grandTotalAmount: this.TotalNetAmount + this.TotalTaxAmount,
-                totalPrepaidAmount: this.TotalPrepaidAmount,
-                duePayableAmount: this.TotalDueAmount);
+            desc.ActualDeliveryDate = this.DeliveryDate;            
 
             desc.AddTradePaymentTerms(description: this.PaymentTerms, dueDate: this.PaymentDueDate);
 
@@ -194,7 +185,23 @@ namespace ERechnung.Models
                 }
             }
 
-            desc.AddApplicableTradeTax(basisAmount: this.TotalNetAmount, percent: overallTaxPercent, taxAmount: this.TotalTaxAmount, typeCode: TaxTypes.VAT, categoryCode: overallTaxCategory);
+            foreach(InvoiceCharge ic in this.TradeCharges)
+            {
+                desc.AddTradeCharge(basisAmount: null, currency: this.Currency, actualAmount: ic.ActualAmount, reason: ic.Reason, taxTypeCode: ic.TaxTypeCode, taxCategoryCode: ic.TaxCategoryCode, taxPercent: ic.TaxPercent, reasonCode: ic.ChargeReasonCode);
+                this.TotalChargeAmount += ic.ActualAmount;
+            }
+
+            desc.SetTotals(
+                lineTotalAmount: this.TotalNetAmount,
+                chargeTotalAmount: this.TotalChargeAmount,
+                allowanceTotalAmount: this.TotalAllowanceChargeAmount,
+                taxBasisAmount: this.TotalGrossAmount,
+                taxTotalAmount: this.TotalTaxAmount,
+                grandTotalAmount: this.TotalGrossAmount + this.TotalTaxAmount,
+                totalPrepaidAmount: this.TotalPrepaidAmount,
+                duePayableAmount: this.TotalDueAmount);
+
+            desc.AddApplicableTradeTax(basisAmount: this.TotalGrossAmount, percent: overallTaxPercent, taxAmount: this.TotalTaxAmount, typeCode: TaxTypes.VAT, categoryCode: overallTaxCategory);
 
             desc.SetPaymentMeans(paymentCode: PaymentMeansTypeCodes.SEPACreditTransfer);
 
@@ -273,5 +280,22 @@ namespace ERechnung.Models
         public string Bankleitzahl { get; set; }
         public string Bankname { get; set; }
         public string Kontoinhaber { get; set; }
+    }
+
+    public class InvoiceCharge
+    {
+        public decimal ActualAmount { get; set; }
+        public string Reason { get; set; }
+        public TaxTypes TaxTypeCode { get; set; }
+        public TaxCategoryCodes TaxCategoryCode { get; set; }
+        public decimal TaxPercent { get; set; }
+        public ChargeReasonCodes ChargeReasonCode {  get; set; }
+        public decimal TaxAmount
+        {
+            get
+            {
+                return (ActualAmount * TaxPercent)/ 100;
+            }
+        }
     }
 }
