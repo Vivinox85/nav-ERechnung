@@ -175,6 +175,23 @@ namespace ERechnung.Models
                 }
                 
                 curItem.OriginTradeCountry = lineItem.OriginCountry;
+
+                // Discount / Rabatt
+                if((lineItem.DiscountAmount > 0) || (lineItem.DiscountPercent > 0))
+                {
+                    curItem.AddSpecifiedTradeAllowance(currency:this.Currency,  basisAmount:lineItem.LineTotal+lineItem.DiscountAmount, actualAmount:lineItem.DiscountAmount,chargePercentage: lineItem.DiscountPercent, reason: "", reasonCode: AllowanceReasonCodes.Discount);
+                }
+
+                // Charge / Gebühr
+                if ((lineItem.DiscountAmount < 0) || (lineItem.DiscountPercent < 0))
+                {
+                    // Kupferzuschlag
+                    if(lineItem.CUPreisDel != 0)
+                    {
+                        curItem.AddSpecifiedTradeCharge(currency: this.Currency, basisAmount: null, actualAmount: lineItem.DiscountAmount * -1, reason: "Kupferzuschlag");
+                    }                    
+                }
+
                 if (lineItem.TaxCategory == TaxCategoryCodes.Z)
                 {
                     overallTaxCategory = TaxCategoryCodes.Z;
@@ -185,6 +202,7 @@ namespace ERechnung.Models
                 }
             }
 
+            // Invoice Level Charge
             foreach(InvoiceCharge ic in this.TradeCharges)
             {
                 desc.AddTradeCharge(basisAmount: null, currency: this.Currency, actualAmount: ic.ActualAmount, reason: ic.Reason, taxTypeCode: ic.TaxTypeCode, taxCategoryCode: ic.TaxCategoryCode, taxPercent: ic.TaxPercent, reasonCode: ic.ChargeReasonCode);
@@ -227,6 +245,9 @@ namespace ERechnung.Models
         public decimal Quantity { get; set; }
         public decimal UnitPrice { get; set; }
         public decimal LineTotal { get; set; }
+        public decimal DiscountAmount { get; set; }
+        public decimal DiscountPercent { get; set; }
+        public decimal CUPreisDel {  get; set; }
 
         public decimal TaxAmount
         {
