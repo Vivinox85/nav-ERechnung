@@ -225,7 +225,12 @@ namespace ERechnung.Models
             } else if (overallTaxCategory == TaxCategoryCodes.G)
             {
                 desc.AddApplicableTradeTax(basisAmount: this.TotalGrossAmount, percent: overallTaxPercent, taxAmount: this.TotalTaxAmount, typeCode: TaxTypes.VAT, categoryCode: overallTaxCategory, exemptionReasonCode: TaxExemptionReasonCodes.VATEX_EU_G);
-            } else
+            }
+            else if (overallTaxCategory == TaxCategoryCodes.K)
+            {
+                desc.AddApplicableTradeTax(basisAmount: this.TotalGrossAmount, percent: overallTaxPercent, taxAmount: this.TotalTaxAmount, typeCode: TaxTypes.VAT, categoryCode: overallTaxCategory, exemptionReasonCode: TaxExemptionReasonCodes.VATEX_EU_IC);
+            }
+            else
             {
                 desc.AddApplicableTradeTax(basisAmount: this.TotalGrossAmount, percent: overallTaxPercent, taxAmount: this.TotalTaxAmount, typeCode: TaxTypes.VAT, categoryCode: overallTaxCategory);
             }
