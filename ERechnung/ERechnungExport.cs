@@ -125,7 +125,7 @@ namespace ERechnung
                 DiscountPercent = (decimal)discountPercent,
                 CUPreisDel = (decimal)cuPreisDel
             });
-        }
+        }        
 
         public void AddBankAccount(string iban, string bic, string bankleitzahl, string bankname, string kontoinhaber)
         {

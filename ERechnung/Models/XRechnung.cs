@@ -192,14 +192,14 @@ namespace ERechnung.Models
                     }                    
                 }
 
-                if (lineItem.TaxCategory == TaxCategoryCodes.Z)
+                foreach(ItemCharacteristic ic in lineItem.ItemCharacteristics)
                 {
-                    overallTaxCategory = TaxCategoryCodes.Z;
+                    curItem.AddApplicableProductCharacteristic(ic.Description, ic.Value);
                 }
-                if (lineItem.TaxPercent == 0)
-                {
-                    overallTaxPercent = 0m;
-                }
+
+                overallTaxCategory = lineItem.TaxCategory;
+                overallTaxPercent = lineItem.TaxPercent;
+
             }
 
             // Invoice Level Charge
@@ -219,7 +219,14 @@ namespace ERechnung.Models
                 totalPrepaidAmount: this.TotalPrepaidAmount,
                 duePayableAmount: this.TotalDueAmount);
 
-            desc.AddApplicableTradeTax(basisAmount: this.TotalGrossAmount, percent: overallTaxPercent, taxAmount: this.TotalTaxAmount, typeCode: TaxTypes.VAT, categoryCode: overallTaxCategory);
+            if (overallTaxCategory == TaxCategoryCodes.AE)
+            {
+                desc.AddApplicableTradeTax(basisAmount: this.TotalGrossAmount, percent: overallTaxPercent, taxAmount: this.TotalTaxAmount, typeCode: TaxTypes.VAT, categoryCode: overallTaxCategory, exemptionReasonCode: TaxExemptionReasonCodes.VATEX_EU_AE);
+            } else
+            {
+                desc.AddApplicableTradeTax(basisAmount: this.TotalGrossAmount, percent: overallTaxPercent, taxAmount: this.TotalTaxAmount, typeCode: TaxTypes.VAT, categoryCode: overallTaxCategory);
+            }
+                
 
             desc.SetPaymentMeans(paymentCode: PaymentMeansTypeCodes.SEPACreditTransfer);
 
