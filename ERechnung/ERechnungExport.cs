@@ -202,5 +202,14 @@ namespace ERechnung
                 ChargeReasonCode = rc
             });
         }
+
+        public void AddLineItemCharacteristic(string description, string value)
+        {
+            this.xRechnung.LineItems[this.xRechnung.LineItems.Count - 1].ItemCharacteristics.Add(new ItemCharacteristic()
+            {
+                Description = description,
+                Value = value
+            });
+        }
     }
 }

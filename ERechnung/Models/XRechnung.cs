@@ -267,6 +267,12 @@ namespace ERechnung.Models
         public TaxCategoryCodes TaxCategory { get; set; }
         public decimal TaxPercent { get; set; }
         public CountryCodes OriginCountry { get; set; }
+        public List<ItemCharacteristic> ItemCharacteristics { get; set; }
+
+        public LineItem()
+        {
+            ItemCharacteristics = new List<ItemCharacteristic>();
+        }
     }
 
     public class Buyer
@@ -318,5 +324,11 @@ namespace ERechnung.Models
                 return (ActualAmount * TaxPercent)/ 100;
             }
         }
+    }
+
+    public class ItemCharacteristic
+    {
+        public string Description { get; set; }
+        public string Value { get; set; }
     }
 }

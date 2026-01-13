@@ -46,5 +46,6 @@ namespace ERechnung
 
         [DispId(13)]
         void AddCharge(double actualAmount, string reason, string taxCategory, string taxType, double taxPercent, string reasonCode);
+
     }
 }
