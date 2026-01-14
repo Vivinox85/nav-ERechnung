@@ -236,7 +236,7 @@ namespace ERechnung.Models
             }
                 
 
-            desc.SetPaymentMeans(paymentCode: PaymentMeansTypeCodes.SEPACreditTransfer);
+            desc.SetPaymentMeans(paymentCode: PaymentMeansTypeCodes.MutuallyDefined);
 
             foreach (Bankkonto bankkonto in this.BankAccounts)
             {
