@@ -167,7 +167,7 @@ namespace ERechnung.Models
                 TradeLineItem curItem;
                 try
                 {
-                    curItem = desc.AddTradeLineItem(lineID: lineItem.ID, name: lineItem.Name, netUnitPrice: lineItem.UnitPrice, unitCode: lineItem.Unit, unitQuantity: lineItem.UnitQuantity, description: lineItem.Description, billedQuantity: lineItem.Quantity, grossUnitPrice: lineItem.UnitPrice + (lineItem.UnitPrice * lineItem.TaxPercent / 100), lineTotalAmount: lineItem.LineTotal, taxType: lineItem.TaxType, categoryCode: lineItem.TaxCategory, taxPercent: lineItem.TaxPercent, sellerAssignedID: lineItem.ID, buyerAssignedID: lineItem.CustomerID);
+                    curItem = desc.AddTradeLineItem(lineID: lineItem.LineID, name: lineItem.Name, netUnitPrice: lineItem.UnitPrice, unitCode: lineItem.Unit, unitQuantity: lineItem.UnitQuantity, description: lineItem.Description, billedQuantity: lineItem.Quantity, grossUnitPrice: lineItem.UnitPrice + (lineItem.UnitPrice * lineItem.TaxPercent / 100), lineTotalAmount: lineItem.LineTotal, taxType: lineItem.TaxType, categoryCode: lineItem.TaxCategory, taxPercent: lineItem.TaxPercent, sellerAssignedID: lineItem.ID, buyerAssignedID: lineItem.CustomerID);
                 }
                 catch
                 {
@@ -253,6 +253,7 @@ namespace ERechnung.Models
     {
         public string ID { get; set; }
         public string Name { get; set; }
+        public string LineID { get; set; }
         public string Description { get; set; }
         public string CustomerID { get; set; }
         public QuantityCodes Unit { get; set; }

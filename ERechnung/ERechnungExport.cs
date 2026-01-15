@@ -94,7 +94,7 @@ namespace ERechnung
             };
         }
 
-        public void AddLineItem(string id, string name, string description, string customerID, double quantity, string quantityCode, double unitPrice, double unitQuantity, string taxCategory, string taxType, double taxPercent, double lineTotal, string originCountry, double discountAmount=0, double discountPercent=0, double cuPreisDel=0)
+        public void AddLineItem(string id, string name, string description, string customerID, string lineID, double quantity, string quantityCode, double unitPrice, double unitQuantity, string taxCategory, string taxType, double taxPercent, double lineTotal, string originCountry, double discountAmount=0, double discountPercent=0, double cuPreisDel=0)
         {
             QuantityCodes qc;
             TaxCategoryCodes tc;
@@ -112,6 +112,7 @@ namespace ERechnung
                 Name = name,
                 Description = description,
                 CustomerID = customerID,
+                LineID = lineID,
                 Quantity = (decimal)quantity,
                 Unit = qc,
                 UnitPrice = (decimal)unitPrice,                
