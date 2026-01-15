@@ -129,51 +129,64 @@ namespace ERechnung.Models
             decimal overallTaxPercent = 19m;
 
             desc = InvoiceDescriptor.CreateInvoice(invoiceNo: this.InvoiceNumber, invoiceDate: this.InvoiceDate, currency: this.Currency);
+
+            // Order No. für gesamte Rechnung
             desc.ReferenceOrderNo = this.OrderNumber;
 
             // Verwendungszweck für Zahlung:
             desc.PaymentReference = this.InvoiceNumber;
 
+            // Daten Käufer
             desc.SetBuyer(name: this.Buyer.Name, postcode: this.Buyer.ZipCode, city: this.Buyer.City, street: this.Buyer.Street2, receiver: this.Buyer.Street, country: this.Buyer.Country, id: this.Buyer.ID);
             desc.AddBuyerTaxRegistration(no: this.Buyer.VATID, schemeID: TaxRegistrationSchemeID.VA);
             desc.SetBuyerContact(name: this.Buyer.Contact, emailAddress: this.Buyer.Email);
             desc.SetBuyerOrderReferenceDocument(orderNo: this.Buyer.OrderReferenceDocument, orderDate: this.Buyer.OrderReferenceDocumentDate);
             desc.SetBuyerElectronicAddress(address: this.Buyer.Email, electronicAddressSchemeID: ElectronicAddressSchemeIdentifiers.EM);
 
+            // Daten Verkäufer
             desc.SetSeller(name: this.Seller.Name, postcode: this.Seller.ZipCode, city: this.Seller.City, street: this.Seller.Street, country: this.Seller.Country, id: this.Seller.ID);
             desc.AddSellerTaxRegistration(no: this.Seller.VATID, schemeID: TaxRegistrationSchemeID.VA);
             desc.AddSellerTaxRegistration(no: this.Seller.TaxNumber, schemeID: TaxRegistrationSchemeID.FC);
             desc.SetSellerContact(name: this.Seller.Contact, orgunit: this.Seller.OrganizationUnit, emailAddress: this.Seller.Email, phoneno: this.Seller.Phone);
             desc.SetSellerElectronicAddress(address: this.Seller.Email, electronicAddressSchemeID: ElectronicAddressSchemeIdentifiers.EM);
 
+            // Lieferadresse
             desc.ShipTo = DeliveryAddress;
 
+            // Lieferdatum
             desc.ActualDeliveryDate = this.DeliveryDate;            
 
+            // Zahlungsbedingungen
             desc.AddTradePaymentTerms(description: this.PaymentTerms, dueDate: this.PaymentDueDate);
 
+            // Skonto Optionen
             foreach (PaymentTerms pt in this.SkontoOptions)
             {
                 desc.AddTradePaymentTerms(pt.Description, pt.DueDate, pt.PaymentTermsType, pt.DueDays, pt.Percentage);
             }
 
+            // Rechnungsnotizen
             foreach (Note curNote in this.Notes)
             {
                 desc.AddNote(note: curNote.Content, subjectCode: curNote.SubjectCode);
             }
 
+            // Rechnungspositionen
             foreach (LineItem lineItem in this.LineItems)
             {
                 TradeLineItem curItem;
                 try
                 {
+                    // Mit vorgegebener LineID
                     curItem = desc.AddTradeLineItem(lineID: lineItem.LineID, name: lineItem.Name, netUnitPrice: lineItem.UnitPrice, unitCode: lineItem.Unit, unitQuantity: lineItem.UnitQuantity, description: lineItem.Description, billedQuantity: lineItem.Quantity, grossUnitPrice: lineItem.UnitPrice + (lineItem.UnitPrice * lineItem.TaxPercent / 100), lineTotalAmount: lineItem.LineTotal, taxType: lineItem.TaxType, categoryCode: lineItem.TaxCategory, taxPercent: lineItem.TaxPercent, sellerAssignedID: lineItem.ID, buyerAssignedID: lineItem.CustomerID);
                 }
                 catch
                 {
+                    // Automatische Vergabe der Line ID
                     curItem = desc.AddTradeLineItem(name: lineItem.Name, netUnitPrice: lineItem.UnitPrice, unitCode: lineItem.Unit, unitQuantity: lineItem.UnitQuantity, description: lineItem.Description, billedQuantity: lineItem.Quantity, grossUnitPrice: lineItem.UnitPrice + (lineItem.UnitPrice * lineItem.TaxPercent / 100), lineTotalAmount: lineItem.LineTotal, taxType: lineItem.TaxType, categoryCode: lineItem.TaxCategory, taxPercent: lineItem.TaxPercent, sellerAssignedID: lineItem.ID, buyerAssignedID: lineItem.CustomerID);
                 }
                 
+                // Ursprungsland
                 curItem.OriginTradeCountry = lineItem.OriginCountry;
 
                 // Discount / Rabatt
@@ -192,6 +205,7 @@ namespace ERechnung.Models
                     }                    
                 }
 
+                // Item Characteristics
                 foreach(ItemCharacteristic ic in lineItem.ItemCharacteristics)
                 {
                     curItem.AddApplicableProductCharacteristic(ic.Description, ic.Value);
@@ -209,6 +223,7 @@ namespace ERechnung.Models
                 this.TotalChargeAmount += ic.ActualAmount;
             }
 
+            // Summen
             desc.SetTotals(
                 lineTotalAmount: this.TotalNetAmount,
                 chargeTotalAmount: this.TotalChargeAmount,
@@ -219,6 +234,8 @@ namespace ERechnung.Models
                 totalPrepaidAmount: this.TotalPrepaidAmount,
                 duePayableAmount: this.TotalDueAmount);
 
+
+            // Steuer Kategorie Rechnung
             if (overallTaxCategory == TaxCategoryCodes.AE)
             {
                 desc.AddApplicableTradeTax(basisAmount: this.TotalGrossAmount, percent: overallTaxPercent, taxAmount: this.TotalTaxAmount, typeCode: TaxTypes.VAT, categoryCode: overallTaxCategory, exemptionReasonCode: TaxExemptionReasonCodes.VATEX_EU_AE);
@@ -235,9 +252,10 @@ namespace ERechnung.Models
                 desc.AddApplicableTradeTax(basisAmount: this.TotalGrossAmount, percent: overallTaxPercent, taxAmount: this.TotalTaxAmount, typeCode: TaxTypes.VAT, categoryCode: overallTaxCategory);
             }
                 
-
+            // Zahlungsart
             desc.SetPaymentMeans(paymentCode: PaymentMeansTypeCodes.MutuallyDefined);
 
+            // Bankkonten
             foreach (Bankkonto bankkonto in this.BankAccounts)
             {
                 desc.AddCreditorFinancialAccount(iban: bankkonto.IBAN, bic: bankkonto.BIC, bankleitzahl: bankkonto.Bankleitzahl, bankName: bankkonto.Bankname, name: bankkonto.Kontoinhaber);
