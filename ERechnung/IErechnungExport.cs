@@ -49,5 +49,8 @@ namespace ERechnung
 
         [DispId(14)]
         void AddLineItemCharacteristic(string description, string value);
+
+        [DispId(15)]
+        void CreateZugferdXML(string filePath);
     }
 }

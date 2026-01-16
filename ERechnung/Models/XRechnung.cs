@@ -82,6 +82,25 @@ namespace ERechnung.Models
             return success;
         }
 
+        public bool CreateZugferdXML(string filePath)
+        {
+            bool success = true;
+            FillInvoiceDescriptor();
+            try
+            {
+                FileStream stream = new FileStream(filePath, FileMode.Create, FileAccess.Write);
+                desc.Save(stream: stream, version: ZUGFeRDVersion.Version23, profile: Profile.Comfort);
+                stream.Flush();
+                stream.Close();
+            }
+            catch (Exception ex)
+            {
+                LogError(ex);
+                success = false;
+            }
+            return success;
+        }
+
         public bool CreatePDF(string inPDFPath, string outPDFPath)
         {
             bool success = true;

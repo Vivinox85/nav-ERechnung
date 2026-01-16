@@ -219,5 +219,10 @@ namespace ERechnung
                 Value = value
             });
         }
+
+        public void CreateZugferdXML(string filePath)
+        {
+            this.xRechnung.CreateZugferdXML(filePath);
+        }
     }
 }
