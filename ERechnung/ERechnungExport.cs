@@ -35,18 +35,20 @@ namespace ERechnung
             this.xRechnung.CreatePDF(inPDFPath, outPDFPath);
         }
 
-        public void FillInvoiceHeader(string invoiceNumber, string orderNumber, DateTime invoiceDate, string currencyCode, DateTime deliveryDate, string paymentTerms, DateTime paymentDueDate)
+        public void FillInvoiceHeader(string invoiceNumber, string buyerReference, string orderNo, DateTime invoiceDate, string currencyCode, DateTime deliveryDate, string paymentTerms, DateTime paymentDueDate, string deliveryNoteNo)
         {
             CurrencyCodes currency;
             Enum.TryParse(currencyCode, out currency);
 
             this.xRechnung.InvoiceNumber = invoiceNumber;
-            this.xRechnung.OrderNumber = orderNumber;
+            this.xRechnung.BuyerReference = buyerReference;
             this.xRechnung.InvoiceDate = invoiceDate;
             this.xRechnung.Currency = currency;
             this.xRechnung.DeliveryDate = deliveryDate;
             this.xRechnung.PaymentTerms = paymentTerms;
             this.xRechnung.PaymentDueDate = paymentDueDate;
+            this.xRechnung.OrderNo = orderNo;
+            this.xRechnung.DeliveryNoteNo = deliveryNoteNo;
         }
 
         public void AddSeller(string name, string street, string zipCode, string city, string country, string vatID, string taxNumber, string contact, string id, string email, string phone)
@@ -99,7 +101,7 @@ namespace ERechnung
             QuantityCodes qc;
             TaxCategoryCodes tc;
             TaxTypes tt;
-            CountryCodes originCountryCode;            
+            CountryCodes originCountryCode;
 
             Enum.TryParse(quantityCode, out qc);
             Enum.TryParse(taxCategory, out tc);

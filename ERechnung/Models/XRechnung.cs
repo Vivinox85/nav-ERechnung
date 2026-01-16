@@ -15,7 +15,9 @@ namespace ERechnung.Models
         public string InvoiceNumber { get; set; }
         public DateTime InvoiceDate { get; set; }
         public CurrencyCodes Currency { get; set; }
-        public string OrderNumber { get; set; }
+        public string BuyerReference { get; set; }
+        public string OrderNo { get; set; }
+        public string DeliveryNoteNo { get; set; }
         public DateTime DeliveryDate { get; set; }
         public string PaymentTerms { get; set; }
         public DateTime PaymentDueDate { get; set; }
@@ -130,8 +132,14 @@ namespace ERechnung.Models
 
             desc = InvoiceDescriptor.CreateInvoice(invoiceNo: this.InvoiceNumber, invoiceDate: this.InvoiceDate, currency: this.Currency);
 
-            // Order No. für gesamte Rechnung
-            desc.ReferenceOrderNo = this.OrderNumber;
+            // Buyer Reference für gesamte Rechnung
+            desc.ReferenceOrderNo = this.BuyerReference;
+
+            // Order No für gesamte Rechnung            
+            desc.SellerOrderReferencedDocument = new SellerOrderReferencedDocument()
+            {
+                ID = this.OrderNo
+            };
 
             // Verwendungszweck für Zahlung:
             desc.PaymentReference = this.InvoiceNumber;
@@ -141,20 +149,26 @@ namespace ERechnung.Models
             desc.AddBuyerTaxRegistration(no: this.Buyer.VATID, schemeID: TaxRegistrationSchemeID.VA);
             desc.SetBuyerContact(name: this.Buyer.Contact, emailAddress: this.Buyer.Email);
             desc.SetBuyerOrderReferenceDocument(orderNo: this.Buyer.OrderReferenceDocument, orderDate: this.Buyer.OrderReferenceDocumentDate);
-            desc.SetBuyerElectronicAddress(address: this.Buyer.Email, electronicAddressSchemeID: ElectronicAddressSchemeIdentifiers.EM);
+            desc.SetBuyerElectronicAddress(address: this.Buyer.Email, electronicAddressSchemeID: ElectronicAddressSchemeIdentifiers.ElectronicMailSmtp);
 
             // Daten Verkäufer
             desc.SetSeller(name: this.Seller.Name, postcode: this.Seller.ZipCode, city: this.Seller.City, street: this.Seller.Street, country: this.Seller.Country, id: this.Seller.ID);
             desc.AddSellerTaxRegistration(no: this.Seller.VATID, schemeID: TaxRegistrationSchemeID.VA);
             desc.AddSellerTaxRegistration(no: this.Seller.TaxNumber, schemeID: TaxRegistrationSchemeID.FC);
             desc.SetSellerContact(name: this.Seller.Contact, orgunit: this.Seller.OrganizationUnit, emailAddress: this.Seller.Email, phoneno: this.Seller.Phone);
-            desc.SetSellerElectronicAddress(address: this.Seller.Email, electronicAddressSchemeID: ElectronicAddressSchemeIdentifiers.EM);
+            desc.SetSellerElectronicAddress(address: this.Seller.Email, electronicAddressSchemeID: ElectronicAddressSchemeIdentifiers.ElectronicMailSmtp);
 
             // Lieferadresse
             desc.ShipTo = DeliveryAddress;
 
             // Lieferdatum
-            desc.ActualDeliveryDate = this.DeliveryDate;            
+            desc.ActualDeliveryDate = this.DeliveryDate;
+            
+            // Lieferscheinnummer
+            if(this.DeliveryNoteNo != null && this.DeliveryNoteNo != "")
+            {
+                desc.SetDespatchAdviceReferencedDocument(this.DeliveryNoteNo, this.DeliveryDate);
+            }            
 
             // Zahlungsbedingungen
             desc.AddTradePaymentTerms(description: this.PaymentTerms, dueDate: this.PaymentDueDate);

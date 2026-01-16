@@ -100,11 +100,11 @@
     <Reference Include="PdfSharp.WPFonts, Version=1.2.0.0, Culture=neutral, PublicKeyToken=f94615aa0424f9eb, processorArchitecture=MSIL">
       <HintPath>..\packages\PDFsharp-extended.1.2.0-preview-1\lib\netstandard2.0\PdfSharp.WPFonts.dll</HintPath>
     </Reference>
-    <Reference Include="s2industries.ZUGFeRD, Version=17.4.0.0, Culture=neutral, PublicKeyToken=eae19aa9fbd2251d, processorArchitecture=MSIL">
-      <HintPath>..\packages\ZUGFeRD-csharp.17.4.0\lib\net48\s2industries.ZUGFeRD.dll</HintPath>
+    <Reference Include="s2industries.ZUGFeRD, Version=18.0.0.0, Culture=neutral, PublicKeyToken=eae19aa9fbd2251d, processorArchitecture=MSIL">
+      <HintPath>..\packages\ZUGFeRD-csharp.18.0.0-beta3\lib\net48\s2industries.ZUGFeRD.dll</HintPath>
     </Reference>
-    <Reference Include="s2industries.ZUGFeRD.PDF, Version=17.4.2.0, Culture=neutral, PublicKeyToken=18b03107da61b096, processorArchitecture=MSIL">
-      <HintPath>..\packages\ZUGFeRD.PDF-csharp.17.4.2\lib\net48\s2industries.ZUGFeRD.PDF.dll</HintPath>
+    <Reference Include="s2industries.ZUGFeRD.PDF, Version=18.0.0.0, Culture=neutral, PublicKeyToken=18b03107da61b096, processorArchitecture=MSIL">
+      <HintPath>..\packages\ZUGFeRD.PDF-csharp.18.0.0-beta3\lib\net48\s2industries.ZUGFeRD.PDF.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Buffers, Version=4.0.5.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
