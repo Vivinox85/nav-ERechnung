@@ -103,6 +103,11 @@ namespace ERechnung
             TaxTypes tt;
             CountryCodes originCountryCode;
 
+            if(quantityCode == "PC")
+            {
+                quantityCode = "C62";
+            }
+
             Enum.TryParse(quantityCode, out qc);
             Enum.TryParse(taxCategory, out tc);
             Enum.TryParse(taxType, out tt);
