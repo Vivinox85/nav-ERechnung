@@ -89,7 +89,7 @@ namespace ERechnung.Models
             try
             {
                 FileStream stream = new FileStream(filePath, FileMode.Create, FileAccess.Write);
-                desc.Save(stream: stream, version: ZUGFeRDVersion.Version23, profile: Profile.Comfort);
+                desc.Save(stream: stream, version: ZUGFeRDVersion.Version23, profile: Profile.Extended);
                 stream.Flush();
                 stream.Close();
             }
