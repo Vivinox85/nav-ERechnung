@@ -35,7 +35,7 @@ namespace ERechnung
             this.xRechnung.CreatePDF(inPDFPath, outPDFPath);
         }
 
-        public void FillInvoiceHeader(string invoiceNumber, string buyerReference, string orderNo, DateTime invoiceDate, string currencyCode, DateTime deliveryDate, string paymentTerms, DateTime paymentDueDate, string deliveryNoteNo)
+        public void FillInvoiceHeader(string invoiceNumber, string buyerReference, string orderNo, DateTime orderDate, DateTime invoiceDate, string currencyCode, DateTime deliveryDate, string paymentTerms, DateTime paymentDueDate, string deliveryNoteNo)
         {
             CurrencyCodes currency;
             Enum.TryParse(currencyCode, out currency);
@@ -48,6 +48,7 @@ namespace ERechnung
             this.xRechnung.PaymentTerms = paymentTerms;
             this.xRechnung.PaymentDueDate = paymentDueDate;
             this.xRechnung.OrderNo = orderNo;
+            this.xRechnung.OrderDate = orderDate;
             this.xRechnung.DeliveryNoteNo = deliveryNoteNo;
         }
 

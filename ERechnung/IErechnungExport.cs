@@ -18,7 +18,7 @@ namespace ERechnung
         void CreateXML(string filePath);
 
         [DispId(4)]
-        void FillInvoiceHeader(string invoiceNumber, string buyerReference, string orderNo, DateTime invoiceDate, string currencyCode, DateTime deliveryDate, string paymentTerms, DateTime paymentDueDate, string deliveryNoteNo);
+        void FillInvoiceHeader(string invoiceNumber, string buyerReference, string orderNo, DateTime orderDate, DateTime invoiceDate, string currencyCode, DateTime deliveryDate, string paymentTerms, DateTime paymentDueDate, string deliveryNoteNo);
 
         [DispId(5)]
         void AddSeller(string name, string street, string zipCode, string city, string country, string vatID, string taxNumber, string contact, string id, string email, string phone);

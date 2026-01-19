@@ -17,6 +17,7 @@ namespace ERechnung.Models
         public CurrencyCodes Currency { get; set; }
         public string BuyerReference { get; set; }
         public string OrderNo { get; set; }
+        public DateTime OrderDate { get; set; }
         public string DeliveryNoteNo { get; set; }
         public DateTime DeliveryDate { get; set; }
         public string PaymentTerms { get; set; }
@@ -157,7 +158,8 @@ namespace ERechnung.Models
             // Order No für gesamte Rechnung            
             desc.SellerOrderReferencedDocument = new SellerOrderReferencedDocument()
             {
-                ID = this.OrderNo
+                ID = this.OrderNo,
+                IssueDateTime = this.OrderDate
             };
 
             // Verwendungszweck für Zahlung:
@@ -167,7 +169,7 @@ namespace ERechnung.Models
             desc.SetBuyer(name: this.Buyer.Name, postcode: this.Buyer.ZipCode, city: this.Buyer.City, street: this.Buyer.Street2, receiver: this.Buyer.Street, country: this.Buyer.Country, id: this.Buyer.ID);
             desc.AddBuyerTaxRegistration(no: this.Buyer.VATID, schemeID: TaxRegistrationSchemeID.VA);
             desc.SetBuyerContact(name: this.Buyer.Contact, emailAddress: this.Buyer.Email);
-            desc.SetBuyerOrderReferenceDocument(orderNo: this.Buyer.OrderReferenceDocument, orderDate: this.Buyer.OrderReferenceDocumentDate);
+            desc.SetBuyerOrderReferenceDocument(orderNo: this.Buyer.OrderReferenceDocument, orderDate: this.OrderDate);
             desc.SetBuyerElectronicAddress(address: this.Buyer.Email, electronicAddressSchemeID: ElectronicAddressSchemeIdentifiers.ElectronicMailSmtp);
 
             // Daten Verkäufer
@@ -358,7 +360,6 @@ namespace ERechnung.Models
         public string Phone { get; set; }
         public string ID { get; set; }
         public string OrderReferenceDocument { get; set; }
-        public DateTime OrderReferenceDocumentDate { get; set; }
     }
 
     public class Seller : Buyer
