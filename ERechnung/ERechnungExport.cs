@@ -225,5 +225,16 @@ namespace ERechnung
         {
             this.xRechnung.CreateZugferdXML(filePath);
         }
+
+        public void AddLineItemDetails(string orderNo, string orderLineNo, DateTime orderDate, string deliveryNo, string deliveryLineNo, DateTime deliveryDate)
+        {
+            int lastLineItemIndex = this.xRechnung.LineItems.Count - 1;
+            this.xRechnung.LineItems[lastLineItemIndex].OrderNo = orderNo;
+            this.xRechnung.LineItems[lastLineItemIndex].OrderLineID = orderLineNo;
+            this.xRechnung.LineItems[lastLineItemIndex].OrderDate = orderDate;
+            this.xRechnung.LineItems[lastLineItemIndex].DeliveryNo = deliveryNo;
+            this.xRechnung.LineItems[lastLineItemIndex].DeliveryDate = deliveryDate;
+            this.xRechnung.LineItems[lastLineItemIndex].DeliveryLineID = deliveryLineNo;
+        }
     }
 }

@@ -52,5 +52,8 @@ namespace ERechnung
 
         [DispId(15)]
         void CreateZugferdXML(string filePath);
+
+        [DispId(16)]
+        void AddLineItemDetails(string orderNo, string orderLineNo, DateTime orderDate, string deliveryNo, string deliveryLineID, DateTime deliveryDate);
     }
 }

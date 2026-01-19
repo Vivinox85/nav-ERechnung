@@ -220,6 +220,10 @@ namespace ERechnung.Models
                     // Automatische Vergabe der Line ID
                     curItem = desc.AddTradeLineItem(name: lineItem.Name, netUnitPrice: lineItem.UnitPrice, unitCode: lineItem.Unit, unitQuantity: lineItem.UnitQuantity, description: lineItem.Description, billedQuantity: lineItem.Quantity, grossUnitPrice: lineItem.UnitPrice + (lineItem.UnitPrice * lineItem.TaxPercent / 100), lineTotalAmount: lineItem.LineTotal, taxType: lineItem.TaxType, categoryCode: lineItem.TaxCategory, taxPercent: lineItem.TaxPercent, sellerAssignedID: lineItem.ID, buyerAssignedID: lineItem.CustomerID);
                 }
+
+                // Referenzen der Lieferposition
+                curItem.SetOrderReferencedDocument(orderReferencedId: lineItem.OrderNo, orderReferencedDate: lineItem.OrderDate, orderReferencedLineId: lineItem.OrderLineID);
+                curItem.SetDeliveryNoteReferencedDocument(deliveryNoteId: lineItem.DeliveryNo, deliveryNoteDate: lineItem.DeliveryDate, deliveryNoteReferencedLineId: lineItem.DeliveryLineID);
                 
                 // Ursprungsland
                 curItem.OriginTradeCountry = lineItem.OriginCountry;
@@ -317,6 +321,12 @@ namespace ERechnung.Models
         public decimal DiscountAmount { get; set; }
         public decimal DiscountPercent { get; set; }
         public decimal CUPreisDel {  get; set; }
+        public string OrderNo { get; set; }
+        public string OrderLineID { get; set; }
+        public DateTime OrderDate { get; set; }
+        public string DeliveryNo { get; set; }
+        public string DeliveryLineID { get; set; }
+        public DateTime DeliveryDate { get; set; }
 
         public decimal TaxAmount
         {
