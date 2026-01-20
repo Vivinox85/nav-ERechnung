@@ -55,5 +55,11 @@ namespace ERechnung
 
         [DispId(16)]
         void AddLineItemDetails(string orderNo, string orderLineNo, DateTime orderDate, string deliveryNo, string deliveryLineID, DateTime deliveryDate);
+
+        [DispId(17)]
+        void FillCreditMemoHeader(string cmNumber, string buyerReference, DateTime cmDate, string currencyCode);
+
+        [DispId(18)]
+        void CreateCreditMemoXML(string filePath);
     }
 }

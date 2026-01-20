@@ -12,6 +12,7 @@ namespace ERechnung.Models
     internal class XRechnung
     {
         private InvoiceDescriptor desc { get; set; }
+        public InvoiceType Type { get; set; }
         public string InvoiceNumber { get; set; }
         public DateTime InvoiceDate { get; set; }
         public CurrencyCodes Currency { get; set; }
@@ -102,6 +103,25 @@ namespace ERechnung.Models
             return success;
         }
 
+        public bool CreateCreditMemoXML(string filePath)
+        {
+            bool success = true;
+            FillInvoiceDescriptor();
+            try
+            {
+                FileStream stream = new FileStream(filePath, FileMode.Create, FileAccess.Write);
+                desc.Save(stream: stream, version: ZUGFeRDVersion.Version23, profile: Profile.XRechnung, format: ZUGFeRDFormats.UBL);
+                stream.Flush();
+                stream.Close();
+            }
+            catch (Exception ex)
+            {
+                LogError(ex);
+                success = false;
+            }
+            return success;
+        }
+
         public bool CreatePDF(string inPDFPath, string outPDFPath)
         {
             bool success = true;
@@ -151,6 +171,7 @@ namespace ERechnung.Models
             decimal overallTaxPercent = 19m;
 
             desc = InvoiceDescriptor.CreateInvoice(invoiceNo: this.InvoiceNumber, invoiceDate: this.InvoiceDate, currency: this.Currency);
+            desc.Type = this.Type;                
 
             // Buyer Reference für gesamte Rechnung
             desc.ReferenceOrderNo = this.BuyerReference;
@@ -192,7 +213,10 @@ namespace ERechnung.Models
             }            
 
             // Zahlungsbedingungen
-            desc.AddTradePaymentTerms(description: this.PaymentTerms, dueDate: this.PaymentDueDate);
+            if(this.Type != InvoiceType.CreditNote)
+            {
+                desc.AddTradePaymentTerms(description: this.PaymentTerms, dueDate: this.PaymentDueDate);
+            }            
 
             // Skonto Optionen
             foreach (PaymentTerms pt in this.SkontoOptions)
@@ -263,22 +287,23 @@ namespace ERechnung.Models
             }
 
             // Summen
-            desc.SetTotals(
-                lineTotalAmount: this.TotalNetAmount,
-                chargeTotalAmount: this.TotalChargeAmount,
-                allowanceTotalAmount: this.TotalAllowanceChargeAmount,
-                taxBasisAmount: this.TotalGrossAmount,
-                taxTotalAmount: this.TotalTaxAmount,
-                grandTotalAmount: this.TotalGrossAmount + this.TotalTaxAmount,
-                totalPrepaidAmount: this.TotalPrepaidAmount,
-                duePayableAmount: this.TotalDueAmount);
-
+                desc.SetTotals(
+                    lineTotalAmount: this.TotalNetAmount,
+                    chargeTotalAmount: this.TotalChargeAmount,
+                    allowanceTotalAmount: this.TotalAllowanceChargeAmount,
+                    taxBasisAmount: this.TotalGrossAmount,
+                    taxTotalAmount: this.TotalTaxAmount,
+                    grandTotalAmount: this.TotalGrossAmount + this.TotalTaxAmount,
+                    totalPrepaidAmount: this.TotalPrepaidAmount,
+                    duePayableAmount: this.TotalDueAmount);
+                
 
             // Steuer Kategorie Rechnung
             if (overallTaxCategory == TaxCategoryCodes.AE)
             {
                 desc.AddApplicableTradeTax(basisAmount: this.TotalGrossAmount, percent: overallTaxPercent, taxAmount: this.TotalTaxAmount, typeCode: TaxTypes.VAT, categoryCode: overallTaxCategory, exemptionReasonCode: TaxExemptionReasonCodes.VATEX_EU_AE);
-            } else if (overallTaxCategory == TaxCategoryCodes.G)
+            }
+            else if (overallTaxCategory == TaxCategoryCodes.G)
             {
                 desc.AddApplicableTradeTax(basisAmount: this.TotalGrossAmount, percent: overallTaxPercent, taxAmount: this.TotalTaxAmount, typeCode: TaxTypes.VAT, categoryCode: overallTaxCategory, exemptionReasonCode: TaxExemptionReasonCodes.VATEX_EU_G);
             }

@@ -40,6 +40,8 @@ namespace ERechnung
             CurrencyCodes currency;
             Enum.TryParse(currencyCode, out currency);
 
+            this.xRechnung.Type = InvoiceType.Invoice;
+
             this.xRechnung.InvoiceNumber = invoiceNumber;
             this.xRechnung.BuyerReference = buyerReference;
             this.xRechnung.InvoiceDate = invoiceDate;
@@ -226,6 +228,11 @@ namespace ERechnung
             this.xRechnung.CreateZugferdXML(filePath);
         }
 
+        public void CreateCreditMemoXML(string filePath)
+        {
+            this.xRechnung.CreateCreditMemoXML(filePath);
+        }
+
         public void AddLineItemDetails(string orderNo, string orderLineNo, DateTime orderDate, string deliveryNo, string deliveryLineNo, DateTime deliveryDate)
         {
             int lastLineItemIndex = this.xRechnung.LineItems.Count - 1;
@@ -235,6 +242,19 @@ namespace ERechnung
             this.xRechnung.LineItems[lastLineItemIndex].DeliveryNo = deliveryNo;
             this.xRechnung.LineItems[lastLineItemIndex].DeliveryDate = deliveryDate;
             this.xRechnung.LineItems[lastLineItemIndex].DeliveryLineID = deliveryLineNo;
+        }
+
+        public void FillCreditMemoHeader(string cmNumber, string buyerReference, DateTime cmDate, string currencyCode)
+        {
+            CurrencyCodes currency;
+            Enum.TryParse(currencyCode, out currency);
+
+            this.xRechnung.Type = InvoiceType.CreditNote;
+
+            this.xRechnung.InvoiceNumber = cmNumber;
+            this.xRechnung.BuyerReference = buyerReference;
+            this.xRechnung.InvoiceDate = cmDate;
+            this.xRechnung.Currency = currency;            
         }
     }
 }
