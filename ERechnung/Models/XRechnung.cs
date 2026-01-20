@@ -204,8 +204,14 @@ namespace ERechnung.Models
             desc.ShipTo = DeliveryAddress;
 
             // Lieferdatum
-            desc.ActualDeliveryDate = this.DeliveryDate;
-            
+            if(this.Type == InvoiceType.CreditNote)
+            {
+                desc.ActualDeliveryDate = this.InvoiceDate;
+            } else
+            {
+                desc.ActualDeliveryDate = this.DeliveryDate;
+            }
+
             // Lieferscheinnummer
             if(this.DeliveryNoteNo != null && this.DeliveryNoteNo != "")
             {
