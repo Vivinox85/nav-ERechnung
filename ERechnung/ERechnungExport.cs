@@ -256,5 +256,11 @@ namespace ERechnung
             this.xRechnung.InvoiceDate = cmDate;
             this.xRechnung.Currency = currency;            
         }
+
+        public void AddLineItemNote(string text)
+        {
+            int lastLineItemIndex = this.xRechnung.LineItems.Count - 1;            
+            this.xRechnung.LineItems[lastLineItemIndex].Notes.Add(new Note(text));
+        }
     }
 }

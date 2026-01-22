@@ -61,5 +61,8 @@ namespace ERechnung
 
         [DispId(18)]
         void CreateCreditMemoXML(string filePath);
+
+        [DispId(19)]
+        void AddLineItemNote(string text);
     }
 }

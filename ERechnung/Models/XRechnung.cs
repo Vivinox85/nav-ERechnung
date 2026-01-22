@@ -72,7 +72,7 @@ namespace ERechnung.Models
             try
             {                
                 FileStream stream = new FileStream(filePath, FileMode.Create, FileAccess.Write);
-                desc.Save(stream: stream, version: ZUGFeRDVersion.Version23, profile: Profile.XRechnung);
+                desc.Save(stream: stream, version: ZUGFeRDVersion.Version23, profile: Profile.XRechnung, format: ZUGFeRDFormats.UBL);
                 stream.Flush();
                 stream.Close();
             }
@@ -128,7 +128,7 @@ namespace ERechnung.Models
             FillInvoiceDescriptor();
             try
             {                
-                InvoicePdfProcessor.SaveToPdf(outPDFPath, ZUGFeRDVersion.Version23, Profile.XRechnung, ZUGFeRDFormats.CII, inPDFPath, this.desc);
+                InvoicePdfProcessor.SaveToPdf(outPDFPath, ZUGFeRDVersion.Version23, Profile.XRechnung, ZUGFeRDFormats.UBL, inPDFPath, this.desc);
             }
             catch (Exception ex)
             {
@@ -188,7 +188,10 @@ namespace ERechnung.Models
 
             // Daten Käufer
             desc.SetBuyer(name: this.Buyer.Name, postcode: this.Buyer.ZipCode, city: this.Buyer.City, street: this.Buyer.Street2, receiver: this.Buyer.Street, country: this.Buyer.Country, id: this.Buyer.ID);
-            desc.AddBuyerTaxRegistration(no: this.Buyer.VATID, schemeID: TaxRegistrationSchemeID.VA);
+            if(this.Buyer.VATID != "" && this.Buyer.VATID != null)
+            {
+                desc.AddBuyerTaxRegistration(no: this.Buyer.VATID, schemeID: TaxRegistrationSchemeID.VA);
+            }            
             desc.SetBuyerContact(name: this.Buyer.Contact, emailAddress: this.Buyer.Email);
             desc.SetBuyerOrderReferenceDocument(orderNo: this.Buyer.OrderReferenceDocument, orderDate: this.OrderDate);
             desc.SetBuyerElectronicAddress(address: this.Buyer.Email, electronicAddressSchemeID: ElectronicAddressSchemeIdentifiers.ElectronicMailSmtp);
@@ -278,6 +281,12 @@ namespace ERechnung.Models
                 foreach(ItemCharacteristic ic in lineItem.ItemCharacteristics)
                 {
                     curItem.AddApplicableProductCharacteristic(ic.Description, ic.Value);
+                }
+
+                // Item Notes
+                foreach (Note curNote in lineItem.Notes)
+                {
+                    curItem.AssociatedDocument.Notes.Add(curNote);                    
                 }
 
                 overallTaxCategory = lineItem.TaxCategory;
@@ -378,10 +387,12 @@ namespace ERechnung.Models
         public decimal TaxPercent { get; set; }
         public CountryCodes OriginCountry { get; set; }
         public List<ItemCharacteristic> ItemCharacteristics { get; set; }
+        public List<Note> Notes { get; set; }
 
         public LineItem()
         {
             ItemCharacteristics = new List<ItemCharacteristic>();
+            Notes = new List<Note>();
         }
     }
 
