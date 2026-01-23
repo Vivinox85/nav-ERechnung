@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
@@ -22,6 +23,7 @@ namespace ERechnung
 
         public ERechnungExport()
         {
+            AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
             Reset();
         }
 
@@ -261,6 +263,20 @@ namespace ERechnung
         {
             int lastLineItemIndex = this.xRechnung.LineItems.Count - 1;            
             this.xRechnung.LineItems[lastLineItemIndex].Notes.Add(new Note(text));
+        }
+
+        private static Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
+        {
+            AssemblyName assemblyName = new AssemblyName(args.Name);
+            string folderPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            string assemblyPath = Path.Combine(folderPath, assemblyName.Name + ".dll");
+
+            if (File.Exists(assemblyPath))
+            {
+                return Assembly.LoadFrom(assemblyPath);
+            }
+
+            return null;
         }
     }
 }

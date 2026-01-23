@@ -128,7 +128,7 @@ namespace ERechnung.Models
             FillInvoiceDescriptor();
             try
             {                
-                InvoicePdfProcessor.SaveToPdf(outPDFPath, ZUGFeRDVersion.Version23, Profile.XRechnung, ZUGFeRDFormats.UBL, inPDFPath, this.desc);
+                InvoicePdfProcessor.SaveToPdf(outPDFPath, ZUGFeRDVersion.Version23, Profile.XRechnung, ZUGFeRDFormats.CII, inPDFPath, this.desc);
             }
             catch (Exception ex)
             {
