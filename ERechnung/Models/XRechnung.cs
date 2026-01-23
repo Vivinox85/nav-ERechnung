@@ -191,8 +191,11 @@ namespace ERechnung.Models
             if(this.Buyer.VATID != "" && this.Buyer.VATID != null)
             {
                 desc.AddBuyerTaxRegistration(no: this.Buyer.VATID, schemeID: TaxRegistrationSchemeID.VA);
+            }
+            if((this.Buyer.Contact != "" && this.Buyer.Contact != null) || (this.Buyer.Email != "" && this.Buyer.Email != null))
+            {
+                desc.SetBuyerContact(name: this.Buyer.Contact, emailAddress: this.Buyer.Email);
             }            
-            desc.SetBuyerContact(name: this.Buyer.Contact, emailAddress: this.Buyer.Email);
             desc.SetBuyerOrderReferenceDocument(orderNo: this.Buyer.OrderReferenceDocument, orderDate: this.OrderDate);
             desc.SetBuyerElectronicAddress(address: this.Buyer.Email, electronicAddressSchemeID: ElectronicAddressSchemeIdentifiers.ElectronicMailSmtp);
 
