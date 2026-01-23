@@ -167,7 +167,6 @@ namespace ERechnung
             };
         }
 
-        //desc.AddTradePaymentTerms("3% Skonto innerhalb 10 Tagen bis 15.03.2018", new DateTime(2018, 3, 15), PaymentTermsType.Skonto, 30, 3m);
         public void AddSkonto(int dueDays, double skontoPercent)
         {
             this.xRechnung.SkontoOptions.Add(new PaymentTerms()
@@ -264,7 +263,7 @@ namespace ERechnung
             int lastLineItemIndex = this.xRechnung.LineItems.Count - 1;            
             this.xRechnung.LineItems[lastLineItemIndex].Notes.Add(new Note(text));
         }
-
+        
         private static Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
         {
             AssemblyName assemblyName = new AssemblyName(args.Name);
