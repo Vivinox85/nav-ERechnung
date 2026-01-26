@@ -74,7 +74,8 @@ namespace ERechnung
                 ID = id,
                 Email = email,
                 Phone = phone,
-                TaxNumber = taxNumber
+                TaxNumber = taxNumber,
+                VendorNo = vendorNo
             };
         }
 
