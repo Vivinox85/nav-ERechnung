@@ -56,7 +56,7 @@ namespace ERechnung
             this.xRechnung.DeliveryNoteNo = deliveryNoteNo;
         }
 
-        public void AddSeller(string name, string street, string zipCode, string city, string country, string vatID, string taxNumber, string contact, string id, string email, string phone)
+        public void AddSeller(string name, string street, string zipCode, string city, string country, string vatID, string taxNumber, string contact, string id, string email, string phone, string vendorNo)
         {
             CountryCodes countryCode;
             Enum.TryParse(country, out countryCode);

@@ -199,8 +199,17 @@ namespace ERechnung.Models
             desc.SetBuyerOrderReferenceDocument(orderNo: this.Buyer.OrderReferenceDocument, orderDate: this.OrderDate);
             desc.SetBuyerElectronicAddress(address: this.Buyer.Email, electronicAddressSchemeID: ElectronicAddressSchemeIdentifiers.ElectronicMailSmtp);
 
-            // Daten Verkäufer
-            desc.SetSeller(name: this.Seller.Name, postcode: this.Seller.ZipCode, city: this.Seller.City, street: this.Seller.Street, country: this.Seller.Country, id: this.Seller.ID, legalOrganization: new LegalOrganization(schemeID: GlobalIDSchemeIdentifiers.CompanyNumber, id: this.Seller.ID));
+            string vendorNo;
+            if(this.Seller.VendorNo != "" && this.Seller.VendorNo != null)
+            {
+                vendorNo = this.Seller.VendorNo;
+            } else
+            {
+                vendorNo = this.Seller.ID;
+            }
+
+                // Daten Verkäufer
+            desc.SetSeller(name: this.Seller.Name, postcode: this.Seller.ZipCode, city: this.Seller.City, street: this.Seller.Street, country: this.Seller.Country, id: vendorNo, legalOrganization: new LegalOrganization(schemeID: GlobalIDSchemeIdentifiers.CompanyNumber, id: this.Seller.ID));
             desc.AddSellerTaxRegistration(no: this.Seller.VATID, schemeID: TaxRegistrationSchemeID.VA);
             desc.AddSellerTaxRegistration(no: this.Seller.TaxNumber, schemeID: TaxRegistrationSchemeID.FC);
             desc.SetSellerContact(name: this.Seller.Contact, orgunit: this.Seller.OrganizationUnit, emailAddress: this.Seller.Email, phoneno: this.Seller.Phone);
@@ -421,6 +430,7 @@ namespace ERechnung.Models
     {
         public string TaxNumber { get; set; }
         public string TaxNumberType { get; set; }
+        public string VendorNo { get; set; }
     }
 
     public class Bankkonto

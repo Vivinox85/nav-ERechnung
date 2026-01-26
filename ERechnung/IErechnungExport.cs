@@ -21,7 +21,7 @@ namespace ERechnung
         void FillInvoiceHeader(string invoiceNumber, string buyerReference, string orderNo, DateTime orderDate, DateTime invoiceDate, string currencyCode, DateTime deliveryDate, string paymentTerms, DateTime paymentDueDate, string deliveryNoteNo);
 
         [DispId(5)]
-        void AddSeller(string name, string street, string zipCode, string city, string country, string vatID, string taxNumber, string contact, string id, string email, string phone);
+        void AddSeller(string name, string street, string zipCode, string city, string country, string vatID, string taxNumber, string contact, string id, string email, string phone, string VendorNo);
 
         [DispId(6)]
         void AddBuyer(string name, string street, string street2, string zipCode, string city, string country, string vatID, string contact, string organizationUnit, string email, string phone, string id, string orderReferenceDocument);
