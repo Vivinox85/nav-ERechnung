@@ -31,6 +31,7 @@ namespace ERechnung.Models
         public List<PaymentTerms> SkontoOptions { get; set; }
         public List<Note> Notes { get; set; }
         public List<InvoiceCharge> TradeCharges { get; set; }
+        public List<TaxApplication> Taxes { get; set; }
         public decimal TotalNetAmount
         {
             get
@@ -167,8 +168,6 @@ namespace ERechnung.Models
 
         private void FillInvoiceDescriptor()
         {
-            TaxCategoryCodes overallTaxCategory = TaxCategoryCodes.S;
-            decimal overallTaxPercent = 19m;
 
             desc = InvoiceDescriptor.CreateInvoice(invoiceNo: this.InvoiceNumber, invoiceDate: this.InvoiceDate, currency: this.Currency);
             desc.Type = this.Type;                
@@ -258,12 +257,12 @@ namespace ERechnung.Models
                 try
                 {
                     // Mit vorgegebener LineID
-                    curItem = desc.AddTradeLineItem(lineID: lineItem.LineID, name: lineItem.Name, netUnitPrice: lineItem.UnitPrice, unitCode: lineItem.Unit, unitQuantity: lineItem.UnitQuantity, description: lineItem.Description, billedQuantity: lineItem.Quantity, grossUnitPrice: lineItem.UnitPrice + (lineItem.UnitPrice * lineItem.TaxPercent / 100), lineTotalAmount: lineItem.LineTotal, taxType: lineItem.TaxType, categoryCode: lineItem.TaxCategory, taxPercent: lineItem.TaxPercent, sellerAssignedID: lineItem.ID, buyerAssignedID: lineItem.CustomerID);
+                    curItem = desc.AddTradeLineItem(lineID: lineItem.LineID, name: lineItem.Name, netUnitPrice: lineItem.UnitPrice, unitCode: lineItem.Unit, unitQuantity: lineItem.UnitQuantity, description: lineItem.Description, billedQuantity: lineItem.Quantity, grossUnitPrice: lineItem.UnitPrice, lineTotalAmount: lineItem.LineTotal, taxType: lineItem.TaxType, categoryCode: lineItem.TaxCategory, taxPercent: lineItem.TaxPercent, sellerAssignedID: lineItem.ID, buyerAssignedID: lineItem.CustomerID);
                 }
                 catch
                 {
                     // Automatische Vergabe der Line ID
-                    curItem = desc.AddTradeLineItem(name: lineItem.Name, netUnitPrice: lineItem.UnitPrice, unitCode: lineItem.Unit, unitQuantity: lineItem.UnitQuantity, description: lineItem.Description, billedQuantity: lineItem.Quantity, grossUnitPrice: lineItem.UnitPrice + (lineItem.UnitPrice * lineItem.TaxPercent / 100), lineTotalAmount: lineItem.LineTotal, taxType: lineItem.TaxType, categoryCode: lineItem.TaxCategory, taxPercent: lineItem.TaxPercent, sellerAssignedID: lineItem.ID, buyerAssignedID: lineItem.CustomerID);
+                    curItem = desc.AddTradeLineItem(name: lineItem.Name, netUnitPrice: lineItem.UnitPrice, unitCode: lineItem.Unit, unitQuantity: lineItem.UnitQuantity, description: lineItem.Description, billedQuantity: lineItem.Quantity, grossUnitPrice: lineItem.UnitPrice, lineTotalAmount: lineItem.LineTotal, taxType: lineItem.TaxType, categoryCode: lineItem.TaxCategory, taxPercent: lineItem.TaxPercent, sellerAssignedID: lineItem.ID, buyerAssignedID: lineItem.CustomerID);
                 }
 
                 // Referenzen der Lieferposition
@@ -301,14 +300,52 @@ namespace ERechnung.Models
                     curItem.AssociatedDocument.Notes.Add(curNote);                    
                 }
 
-                overallTaxCategory = lineItem.TaxCategory;
-                overallTaxPercent = lineItem.TaxPercent;
+                if(this.Taxes.Count > 0)
+                {
+                    bool exists = false;
+                    foreach(TaxApplication t in this.Taxes)
+                    {
+                        if (t.Percent == lineItem.TaxPercent && t.Category == lineItem.TaxCategory && !exists)
+                        {
+                            t.Amount += lineItem.LineTotal;
+                            exists = true;
+                        }
+                    }
+                    if (!exists)
+                    {
+                        this.Taxes.Add(new TaxApplication() { Category = lineItem.TaxCategory, Percent = lineItem.TaxPercent, Amount = lineItem.LineTotal });
+                    }
+                }
+                else
+                {
+                    this.Taxes.Add(new TaxApplication() { Category = lineItem.TaxCategory, Percent = lineItem.TaxPercent, Amount = lineItem.LineTotal });
+                }
 
             }
 
             // Invoice Level Charge
             foreach(InvoiceCharge ic in this.TradeCharges)
             {
+                if (this.Taxes.Count > 0)
+                {
+                    bool exists = false;
+                    foreach (TaxApplication t in this.Taxes)
+                    {
+                        if (t.Percent == ic.TaxPercent && t.Category == ic.TaxCategoryCode && !exists)
+                        {
+                            t.Amount += ic.ActualAmount;
+                            exists = true;
+                        }
+                    }
+                    if (!exists)
+                    {
+                        this.Taxes.Add(new TaxApplication() { Category = ic.TaxCategoryCode, Percent = ic.TaxPercent, Amount = ic.ActualAmount });
+                    }
+                }
+                else
+                {
+                    this.Taxes.Add(new TaxApplication() { Category = ic.TaxCategoryCode, Percent = ic.TaxPercent, Amount = ic.ActualAmount });
+                }
                 desc.AddTradeCharge(basisAmount: null, currency: this.Currency, actualAmount: ic.ActualAmount, reason: ic.Reason, taxTypeCode: ic.TaxTypeCode, taxCategoryCode: ic.TaxCategoryCode, taxPercent: ic.TaxPercent, reasonCode: ic.ChargeReasonCode);
                 this.TotalChargeAmount += ic.ActualAmount;
             }
@@ -325,22 +362,23 @@ namespace ERechnung.Models
                     duePayableAmount: this.TotalDueAmount);
                 
 
-            // Steuer Kategorie Rechnung
-            if (overallTaxCategory == TaxCategoryCodes.AE)
+            foreach(TaxApplication t in this.Taxes)
             {
-                desc.AddApplicableTradeTax(basisAmount: this.TotalGrossAmount, percent: overallTaxPercent, taxAmount: this.TotalTaxAmount, typeCode: TaxTypes.VAT, categoryCode: overallTaxCategory, exemptionReasonCode: TaxExemptionReasonCodes.VATEX_EU_AE);
-            }
-            else if (overallTaxCategory == TaxCategoryCodes.G)
-            {
-                desc.AddApplicableTradeTax(basisAmount: this.TotalGrossAmount, percent: overallTaxPercent, taxAmount: this.TotalTaxAmount, typeCode: TaxTypes.VAT, categoryCode: overallTaxCategory, exemptionReasonCode: TaxExemptionReasonCodes.VATEX_EU_G);
-            }
-            else if (overallTaxCategory == TaxCategoryCodes.K)
-            {
-                desc.AddApplicableTradeTax(basisAmount: this.TotalGrossAmount, percent: overallTaxPercent, taxAmount: this.TotalTaxAmount, typeCode: TaxTypes.VAT, categoryCode: overallTaxCategory, exemptionReasonCode: TaxExemptionReasonCodes.VATEX_EU_IC);
-            }
-            else
-            {
-                desc.AddApplicableTradeTax(basisAmount: this.TotalGrossAmount, percent: overallTaxPercent, taxAmount: this.TotalTaxAmount, typeCode: TaxTypes.VAT, categoryCode: overallTaxCategory);
+                switch (t.Category)
+                {
+                    case TaxCategoryCodes.AE:
+                        desc.AddApplicableTradeTax(basisAmount: t.Amount, percent: t.Percent, taxAmount: (t.Amount/100) * t.Percent, typeCode: TaxTypes.VAT, categoryCode: t.Category, exemptionReasonCode: TaxExemptionReasonCodes.VATEX_EU_AE);
+                        break;
+                    case TaxCategoryCodes.G:
+                        desc.AddApplicableTradeTax(basisAmount: t.Amount, percent: t.Percent, taxAmount: (t.Amount / 100) * t.Percent, typeCode: TaxTypes.VAT, categoryCode: t.Category, exemptionReasonCode: TaxExemptionReasonCodes.VATEX_EU_G);
+                        break;
+                    case TaxCategoryCodes.K:
+                        desc.AddApplicableTradeTax(basisAmount: t.Amount, percent: t.Percent, taxAmount: (t.Amount / 100) * t.Percent, typeCode: TaxTypes.VAT, categoryCode: t.Category, exemptionReasonCode: TaxExemptionReasonCodes.VATEX_EU_IC);
+                        break;
+                    default:
+                        desc.AddApplicableTradeTax(basisAmount: t.Amount, percent: t.Percent, taxAmount: (t.Amount / 100) * t.Percent, typeCode: TaxTypes.VAT, categoryCode: t.Category);
+                        break;
+                }                
             }
                 
             // Zahlungsart
@@ -463,5 +501,12 @@ namespace ERechnung.Models
     {
         public string Description { get; set; }
         public string Value { get; set; }
+    }
+
+    public class TaxApplication
+    {
+        public decimal Percent { get; set; }
+        public TaxCategoryCodes Category {  get; set; }
+        public decimal Amount { get; set; }
     }
 }

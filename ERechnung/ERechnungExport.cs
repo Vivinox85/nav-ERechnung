@@ -186,6 +186,7 @@ namespace ERechnung
             this.xRechnung.SkontoOptions = new List<PaymentTerms>();
             this.xRechnung.Notes = new List<Note>();
             this.xRechnung.TradeCharges = new List<InvoiceCharge>();
+            this.xRechnung.Taxes = new List<TaxApplication>();
         }
 
         public void AddInvoiceNote(string text, string subjectCode)
