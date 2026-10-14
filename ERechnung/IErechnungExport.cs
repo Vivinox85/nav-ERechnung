@@ -64,5 +64,11 @@ namespace ERechnung
 
         [DispId(19)]
         void AddLineItemNote(string text);
+
+        [DispId(20)]
+        void SetupMailer(string server, int port, bool ssl, string user = "", string password = "");
+
+        [DispId(21)]
+        void SendERechnungMail(string from, string to, string subject, string body, string eRechnungPDF);
     }
 }

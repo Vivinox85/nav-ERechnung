@@ -92,7 +92,7 @@ namespace ERechnung.Models
             try
             {
                 FileStream stream = new FileStream(filePath, FileMode.Create, FileAccess.Write);
-                desc.Save(stream: stream, version: ZUGFeRDVersion.Version23, profile: Profile.Extended);
+                desc.Save(stream: stream, version: ZUGFeRDVersion.Version23, profile: Profile.Extended, format: ZUGFeRDFormats.CII);
                 stream.Flush();
                 stream.Close();
             }
@@ -208,7 +208,7 @@ namespace ERechnung.Models
             }
 
                 // Daten Verkäufer
-            desc.SetSeller(name: this.Seller.Name, postcode: this.Seller.ZipCode, city: this.Seller.City, street: this.Seller.Street, country: this.Seller.Country, id: vendorNo, legalOrganization: new LegalOrganization(schemeID: GlobalIDSchemeIdentifiers.CompanyNumber, id: this.Seller.ID));
+            desc.SetSeller(name: this.Seller.Name, postcode: this.Seller.ZipCode, city: this.Seller.City, street: this.Seller.Street, country: this.Seller.Country, id: vendorNo);
             desc.AddSellerTaxRegistration(no: this.Seller.VATID, schemeID: TaxRegistrationSchemeID.VA);
             desc.AddSellerTaxRegistration(no: this.Seller.TaxNumber, schemeID: TaxRegistrationSchemeID.FC);
             desc.SetSellerContact(name: this.Seller.Contact, orgunit: this.Seller.OrganizationUnit, emailAddress: this.Seller.Email, phoneno: this.Seller.Phone);
@@ -263,6 +263,22 @@ namespace ERechnung.Models
                 {
                     // Automatische Vergabe der Line ID
                     curItem = desc.AddTradeLineItem(name: lineItem.Name, netUnitPrice: lineItem.UnitPrice, unitCode: lineItem.Unit, unitQuantity: lineItem.UnitQuantity, description: lineItem.Description, billedQuantity: lineItem.Quantity, grossUnitPrice: lineItem.UnitPrice, lineTotalAmount: lineItem.LineTotal, taxType: lineItem.TaxType, categoryCode: lineItem.TaxCategory, taxPercent: lineItem.TaxPercent, sellerAssignedID: lineItem.ID, buyerAssignedID: lineItem.CustomerID);
+                }
+
+                switch (lineItem.TaxCategory)
+                {
+                    case TaxCategoryCodes.K:
+                        curItem.TaxExemptionReason = "Kein Ausweis der Umsatzsteuer bei innergemeinschaftlichen Lieferungen";
+                        curItem.TaxExemptionReasonCode = TaxExemptionReasonCodes.VATEX_EU_IC;
+                        break;
+                    case TaxCategoryCodes.G:
+                        curItem.TaxExemptionReason = "Export outside the EU";
+                        curItem.TaxExemptionReasonCode = TaxExemptionReasonCodes.VATEX_EU_G;
+                        break;
+                    case TaxCategoryCodes.AE:
+                        curItem.TaxExemptionReason = "Steuerschuldnerschaft des Leistungsempfängers";
+                        curItem.TaxExemptionReasonCode = TaxExemptionReasonCodes.VATEX_EU_AE;
+                        break;
                 }
 
                 // Referenzen der Lieferposition
@@ -367,13 +383,13 @@ namespace ERechnung.Models
                 switch (t.Category)
                 {
                     case TaxCategoryCodes.AE:
-                        desc.AddApplicableTradeTax(basisAmount: t.Amount, percent: t.Percent, taxAmount: (t.Amount/100) * t.Percent, typeCode: TaxTypes.VAT, categoryCode: t.Category, exemptionReasonCode: TaxExemptionReasonCodes.VATEX_EU_AE);
+                        desc.AddApplicableTradeTax(basisAmount: t.Amount, percent: t.Percent, taxAmount: (t.Amount/100) * t.Percent, typeCode: TaxTypes.VAT, categoryCode: t.Category, exemptionReason: "Steuerschuldnerschaft des Leistungsempfängers", exemptionReasonCode: TaxExemptionReasonCodes.VATEX_EU_AE);
                         break;
                     case TaxCategoryCodes.G:
-                        desc.AddApplicableTradeTax(basisAmount: t.Amount, percent: t.Percent, taxAmount: (t.Amount / 100) * t.Percent, typeCode: TaxTypes.VAT, categoryCode: t.Category, exemptionReasonCode: TaxExemptionReasonCodes.VATEX_EU_G);
+                        desc.AddApplicableTradeTax(basisAmount: t.Amount, percent: t.Percent, taxAmount: (t.Amount / 100) * t.Percent, typeCode: TaxTypes.VAT, categoryCode: t.Category, exemptionReason: "Export outside the EU", exemptionReasonCode: TaxExemptionReasonCodes.VATEX_EU_G);
                         break;
                     case TaxCategoryCodes.K:
-                        desc.AddApplicableTradeTax(basisAmount: t.Amount, percent: t.Percent, taxAmount: (t.Amount / 100) * t.Percent, typeCode: TaxTypes.VAT, categoryCode: t.Category, exemptionReasonCode: TaxExemptionReasonCodes.VATEX_EU_IC);
+                        desc.AddApplicableTradeTax(basisAmount: t.Amount, percent: t.Percent, taxAmount: (t.Amount / 100) * t.Percent, typeCode: TaxTypes.VAT, categoryCode: t.Category, exemptionReason: "Kein Ausweis der Umsatzsteuer bei innergemeinschaftlichen Lieferungen", exemptionReasonCode: TaxExemptionReasonCodes.VATEX_EU_IC);
                         break;
                     default:
                         desc.AddApplicableTradeTax(basisAmount: t.Amount, percent: t.Percent, taxAmount: (t.Amount / 100) * t.Percent, typeCode: TaxTypes.VAT, categoryCode: t.Category);
@@ -382,7 +398,7 @@ namespace ERechnung.Models
             }
                 
             // Zahlungsart
-            desc.SetPaymentMeans(paymentCode: PaymentMeansTypeCodes.MutuallyDefined);
+            desc.SetPaymentMeans(paymentCode: PaymentMeansTypeCodes.SEPACreditTransfer);
 
             // Bankkonten
             foreach (Bankkonto bankkonto in this.BankAccounts)

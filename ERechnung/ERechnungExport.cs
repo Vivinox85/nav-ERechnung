@@ -20,6 +20,7 @@ namespace ERechnung
     public class ERechnungExport : IErechnungExport
     {
         private XRechnung xRechnung;
+        private Mailer mailer;
 
         public ERechnungExport()
         {
@@ -265,7 +266,18 @@ namespace ERechnung
             int lastLineItemIndex = this.xRechnung.LineItems.Count - 1;            
             this.xRechnung.LineItems[lastLineItemIndex].Notes.Add(new Note(text));
         }
-        
+
+        public void SetupMailer(string server, int port, bool ssl, string user = "", string password = "")
+        {
+            this.mailer = new Mailer();
+            this.mailer.Setup(server, port, ssl, user, password);
+        }
+
+        public void SendERechnungMail(string from, string to, string subject, string body, string eRechnungPDF)
+        {
+            this.mailer.SendEmail(from, to, subject, body, eRechnungPDF);
+        }
+
         private static Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
         {
             AssemblyName assemblyName = new AssemblyName(args.Name);
